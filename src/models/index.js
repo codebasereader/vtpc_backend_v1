@@ -7,6 +7,8 @@ const Enquiry = require("./Enquiry");
 const Office = require("./Office");
 const StaffMember = require("./StaffMember");
 const Event = require("./Event");
+const City = require("./City");
+const EventSector = require("./EventSector");
 const Download = require("./Download");
 const HomepageContent = require("./HomepageContent");
 const NewsletterSubscriber = require("./NewsletterSubscriber");
@@ -22,6 +24,8 @@ module.exports = {
   Office,
   StaffMember,
   Event,
+  City,
+  EventSector,
   Download,
   HomepageContent,
   NewsletterSubscriber,

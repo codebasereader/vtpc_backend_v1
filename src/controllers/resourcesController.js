@@ -1,7 +1,9 @@
 const {
   Leader,
   District,
+  City,
   FocusSector,
+  EventSector,
   GIProduct,
   Office,
   StaffMember,
@@ -22,11 +24,23 @@ const districts = makeCrud(District, {
   slugFrom: "name",
 });
 
+const cities = makeCrud(City, {
+  label: "City",
+  slugField: "slug",
+  slugFrom: "name",
+});
+
 const focusSectors = makeCrud(FocusSector, {
   label: "Focus sector",
   slugField: "slug",
   slugFrom: "name.en",
   fileFields: { image: "focus-sectors" },
+});
+
+const eventSectors = makeCrud(EventSector, {
+  label: "Event sector",
+  slugField: "slug",
+  slugFrom: "name.en",
 });
 
 const giProducts = makeCrud(GIProduct, {
@@ -46,7 +60,7 @@ const staff = makeCrud(StaffMember, {
 
 const events = makeCrud(Event, {
   label: "Event",
-  sort: { date: 1 },
+  sort: { startDate: 1 },
 });
 
 const downloads = makeCrud(Download, {
@@ -58,7 +72,9 @@ const downloads = makeCrud(Download, {
 module.exports = {
   leaders,
   districts,
+  cities,
   focusSectors,
+  eventSectors,
   giProducts,
   offices,
   staff,

@@ -1,10 +1,13 @@
 const env = require("../config/env");
 const { connectDb } = require("../config/db");
+const { toSlug } = require("../utils/slug");
 const {
   Page,
   Leader,
   District,
+  City,
   FocusSector,
+  EventSector,
   GIProduct,
   Office,
   StaffMember,
@@ -58,18 +61,55 @@ async function migrateLeaderNames() {
   }
 }
 
+async function migrateEvents() {
+  const legacy = await Event.collection
+    .find({ $or: [{ date: { $exists: true } }, { location: { $exists: true } }] })
+    .toArray();
+
+  for (const doc of legacy) {
+    const $set = {};
+    if (!doc.type) $set.type = "domestic";
+    if (!doc.sector) $set.sector = "multi-product";
+    if (!doc.city) {
+      const raw = doc.location && typeof doc.location === "object" ? doc.location.en : doc.location;
+      $set.city = raw ? toSlug(raw) : "bengaluru";
+    }
+    if (doc.isDateTBA !== true && !doc.startDate && doc.date) {
+      const parsed = new Date(doc.date);
+      if (!Number.isNaN(parsed.getTime())) {
+        $set.startDate = parsed;
+        $set.isDateTBA = false;
+      } else {
+        const year = Number(String(doc.date).match(/\d{4}/)?.[0]);
+        $set.isDateTBA = true;
+        $set.tbaYear = year || new Date().getFullYear();
+      }
+    }
+    await Event.collection.updateOne(
+      { _id: doc._id },
+      { $set, $unset: { date: "", location: "" } }
+    );
+  }
+  if (legacy.length) {
+    console.log(`Event: migrated ${legacy.length} legacy document(s)`);
+  }
+}
+
 async function seed() {
   await connectDb();
   await upsertAdmin();
   await migrateLeaderNames();
+  await migrateEvents();
   await replaceCollection(Page, data.pages, "slug");
   await replaceCollection(Leader, data.leaders, "name.en");
   await replaceCollection(District, data.districts, "slug");
+  await replaceCollection(City, data.cities, "slug");
   await replaceCollection(FocusSector, data.focusSectors, "slug");
+  await replaceCollection(EventSector, data.eventSectors, "slug");
   await replaceCollection(GIProduct, data.giProducts, "slug");
   await replaceCollection(Office, data.offices, "city");
   await replaceCollection(StaffMember, data.staff, "name");
-  await replaceCollection(Event, data.events, "date");
+  await replaceCollection(Event, data.events, "title.en");
   await replaceCollection(Download, data.downloads, "fileUrl");
 
   const homepage = await HomepageContent.findOne();

@@ -6,7 +6,9 @@ const newsletter = require("../controllers/newsletterController");
 const {
   leaders,
   districts,
+  cities,
   focusSectors,
+  eventSectors,
   giProducts,
   offices,
   staff,
@@ -21,7 +23,9 @@ router.get("/pages/:slug", page.getBySlug);
 router.get("/leaders", leaders.list);
 router.get("/districts", districts.list);
 router.get("/districts/:id", districts.get);
+router.get("/cities", cities.list);
 router.get("/focus-sectors", focusSectors.list);
+router.get("/event-sectors", eventSectors.list);
 router.get("/focus-sectors/:id", focusSectors.get);
 router.get("/gi-products", giProducts.list);
 router.get("/gi-products/:id", giProducts.get);

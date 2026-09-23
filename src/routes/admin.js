@@ -7,7 +7,9 @@ const uploadCtrl = require("../controllers/uploadController");
 const {
   leaders,
   districts,
+  cities,
   focusSectors,
+  eventSectors,
   giProducts,
   offices,
   staff,
@@ -35,6 +37,10 @@ router.post("/districts", districts.create);
 router.put("/districts/:id", districts.update);
 router.delete("/districts/:id", districts.remove);
 
+router.post("/cities", cities.create);
+router.put("/cities/:id", cities.update);
+router.delete("/cities/:id", cities.remove);
+
 router.post(
   "/focus-sectors",
   setUploadFolders({ image: "focus-sectors", file: "focus-sectors" }),
@@ -48,6 +54,10 @@ router.put(
   focusSectors.update
 );
 router.delete("/focus-sectors/:id", focusSectors.remove);
+
+router.post("/event-sectors", eventSectors.create);
+router.put("/event-sectors/:id", eventSectors.update);
+router.delete("/event-sectors/:id", eventSectors.remove);
 
 router.post(
   "/gi-products",
