@@ -7,7 +7,8 @@
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
     "seed": "node src/seed/index.js",
-    "create-admin": "node src/scripts/createAdmin.js"
+    "create-admin": "node src/scripts/createAdmin.js",
+    "migrate:leader-names": "node src/scripts/migrateLeaderNames.js"
   },
   "engines": {
     "node": ">=18"

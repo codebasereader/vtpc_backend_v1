@@ -4,7 +4,7 @@ const { apiJson } = require("./plugins/apiJson");
 
 const leaderSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true, trim: true },
+    name: { type: bilingualSchema, default: () => ({}) },
     designation: { type: bilingualSchema, default: () => ({}) },
     photo: { type: String, default: "" },
     order: { type: Number, default: 0 },

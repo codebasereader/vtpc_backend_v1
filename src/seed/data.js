@@ -20,20 +20,22 @@ const pages = PAGE_SLUGS.map(([slug, title]) => ({
 
 const leaders = [
   {
-    name: "Shri Siddaramaiah",
+    name: bilingual("Shri Siddaramaiah", "ಶ್ರೀ ಸಿದ್ದರಾಮಯ್ಯ"),
     designation: bilingual("Hon'ble Chief Minister of Karnataka"),
     photo: "/uploads/leaders/cm.jpg",
     order: 1,
   },
   {
-    name: "Shri D.K. Shivakumar",
+    name: bilingual("Shri D.K. Shivakumar", "ಶ್ರೀ ಡಿ.ಕೆ. ಶಿವಕುಮಾರ್"),
     designation: bilingual("Hon'ble Deputy Chief Minister of Karnataka"),
     photo: "/uploads/leaders/dcm.jpg",
     order: 2,
   },
   {
-    name: "Shri M.B. Patil",
-    designation: bilingual("Hon'ble Minister for Large & Medium Industries and Infrastructure Development"),
+    name: bilingual("Shri M.B. Patil", "ಶ್ರೀ ಎಂ.ಬಿ. ಪಾಟೀಲ"),
+    designation: bilingual(
+      "Hon'ble Minister for Large & Medium Industries and Infrastructure Development"
+    ),
     photo: "/uploads/leaders/minister-lmi.jpg",
     order: 3,
   },

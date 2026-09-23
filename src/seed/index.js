@@ -32,9 +32,13 @@ async function upsertAdmin() {
   console.log(`Created admin ${email}`);
 }
 
+function uniqueValue(row, uniqueKey) {
+  return uniqueKey.split(".").reduce((acc, key) => (acc == null ? acc : acc[key]), row);
+}
+
 async function replaceCollection(Model, rows, uniqueKey) {
   for (const row of rows) {
-    const filter = { [uniqueKey]: row[uniqueKey] };
+    const filter = { [uniqueKey]: uniqueValue(row, uniqueKey) };
     await Model.findOneAndUpdate(filter, row, {
       upsert: true,
       new: true,
@@ -45,11 +49,21 @@ async function replaceCollection(Model, rows, uniqueKey) {
   console.log(`${Model.modelName}: upserted ${rows.length}`);
 }
 
+async function migrateLeaderNames() {
+  const result = await Leader.collection.updateMany({ name: { $type: "string" } }, [
+    { $set: { name: { en: "$name", kn: "" } } },
+  ]);
+  if (result.modifiedCount) {
+    console.log(`Leader: migrated ${result.modifiedCount} string name(s) to { en, kn }`);
+  }
+}
+
 async function seed() {
   await connectDb();
   await upsertAdmin();
+  await migrateLeaderNames();
   await replaceCollection(Page, data.pages, "slug");
-  await replaceCollection(Leader, data.leaders, "name");
+  await replaceCollection(Leader, data.leaders, "name.en");
   await replaceCollection(District, data.districts, "slug");
   await replaceCollection(FocusSector, data.focusSectors, "slug");
   await replaceCollection(GIProduct, data.giProducts, "slug");

@@ -10,12 +10,12 @@ cp .env.example .env
 
 npm install
 npm run seed          # admin user + starter content
-npm run dev           # http://localhost:4000
+npm run dev           # http://localhost:4200  (PORT / PUBLIC_BASE_URL must match)
 ```
 
 Health check: `GET /health`
 
-Frontend env: `VITE_API_BASE_URL=http://localhost:4000`
+Frontend env: `VITE_API_BASE_URL=http://localhost:4200`
 
 Default editor login (change immediately):
 
