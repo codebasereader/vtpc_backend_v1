@@ -1,0 +1,95 @@
+const { toSlug, isObjectId } = require("../utils/slug");
+const { parseRequestBody } = require("../utils/parseBody");
+const { sendJson, toApi } = require("../utils/serialize");
+const { asyncHandler } = require("../utils/errors");
+const { findByParamOrThrow } = require("../utils/lookup");
+const { applyUploadedFiles, deleteLocal } = require("../utils/upload");
+
+function getPath(obj, path) {
+  return path.split(".").reduce((acc, key) => (acc == null ? acc : acc[key]), obj);
+}
+
+function applySlugFields(body, { slugField, slugFrom } = {}) {
+  if (!slugField) {
+    delete body.id;
+    return body;
+  }
+  if (body.id && !body[slugField] && !isObjectId(body.id)) {
+    body[slugField] = toSlug(body.id);
+  }
+  if (!body[slugField] && slugFrom) {
+    const source = getPath(body, slugFrom);
+    if (source) body[slugField] = toSlug(source);
+  }
+  if (body[slugField]) {
+    body[slugField] = toSlug(body[slugField]);
+  }
+  delete body.id;
+  return body;
+}
+
+function makeCrud(Model, options = {}) {
+  const {
+    slugField = null,
+    slugFrom = null,
+    sort = null,
+    label = "Record",
+    fileFields = {},
+  } = options;
+
+  const fileKeys = Object.keys(fileFields);
+
+  function incoming(req) {
+    const body = parseRequestBody(req.body || {});
+    applyUploadedFiles(req, body, fileFields);
+    applySlugFields(body, { slugField, slugFrom });
+    return body;
+  }
+
+  return {
+    list: asyncHandler(async (req, res) => {
+      const query = Model.find();
+      if (sort) query.sort(sort);
+      const docs = await query;
+      sendJson(
+        res,
+        docs.map((d) => d.toJSON())
+      );
+    }),
+
+    get: asyncHandler(async (req, res) => {
+      const doc = await findByParamOrThrow(Model, req.params.id, slugField, label);
+      sendJson(res, doc.toJSON());
+    }),
+
+    create: asyncHandler(async (req, res) => {
+      const body = incoming(req);
+      const doc = await Model.create(body);
+      sendJson(res, doc.toJSON(), 201);
+    }),
+
+    update: asyncHandler(async (req, res) => {
+      const doc = await findByParamOrThrow(Model, req.params.id, slugField, label);
+      const body = incoming(req);
+      for (const key of fileKeys) {
+        if (body[key] && body[key] !== doc[key]) {
+          deleteLocal(doc[key]);
+        }
+      }
+      Object.assign(doc, body);
+      await doc.save();
+      sendJson(res, doc.toJSON());
+    }),
+
+    remove: asyncHandler(async (req, res) => {
+      const doc = await findByParamOrThrow(Model, req.params.id, slugField, label);
+      for (const key of fileKeys) {
+        if (doc[key]) deleteLocal(doc[key]);
+      }
+      await doc.deleteOne();
+      res.status(200).json({ message: `${label} deleted` });
+    }),
+  };
+}
+
+module.exports = { makeCrud, applySlugFields, toApi };
