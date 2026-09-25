@@ -18,6 +18,7 @@ const {
   warehouses,
   downloads,
 } = require("../controllers/resourcesController");
+const market = require("../controllers/marketIntelligenceController");
 const { requireAuth } = require("../middleware/auth");
 const { upload, setUploadFolders } = require("../utils/upload");
 
@@ -105,5 +106,9 @@ router.put("/homepage-content", homepage.update);
 
 router.get("/newsletter/subscribers", newsletter.list);
 router.get("/newsletter/subscribers/export", newsletter.exportCsv);
+
+router.post("/state-exports/bulk-replace", market.replaceStateExports);
+router.post("/top-products/bulk-replace", market.replaceTopProducts);
+router.post("/country-products/bulk-replace", market.replaceCountryProducts);
 
 module.exports = router;

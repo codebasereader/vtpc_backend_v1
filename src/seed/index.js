@@ -17,6 +17,7 @@ const {
   AdminUser,
 } = require("../models");
 const data = require("./data");
+const { importMarketIntelligence } = require("./marketIntelligence");
 
 async function upsertAdmin() {
   const email = env.admin.email.toLowerCase();
@@ -122,6 +123,8 @@ async function seed() {
     await HomepageContent.create(data.homepage);
     console.log("HomepageContent: created");
   }
+
+  await importMarketIntelligence();
 
   console.log("Seed complete.");
   process.exit(0);

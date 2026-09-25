@@ -5,6 +5,11 @@ function apiJson(schema, { idFrom, keepTimestamps = false } = {}) {
     delete ret._id;
     delete ret.__v;
     delete ret.passwordHash;
+    for (const key of Object.keys(ret)) {
+      if (ret[key] instanceof Map) {
+        ret[key] = Object.fromEntries(ret[key]);
+      }
+    }
     if (!keepTimestamps) {
       delete ret.createdAt;
       delete ret.updatedAt;

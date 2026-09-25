@@ -17,6 +17,7 @@ const {
   warehouses,
   downloads,
 } = require("../controllers/resourcesController");
+const market = require("../controllers/marketIntelligenceController");
 const { publicWriteLimiter } = require("../middleware/rateLimit");
 
 const router = express.Router();
@@ -39,6 +40,9 @@ router.get("/taluks", taluks.list);
 router.get("/warehouses", warehouses.list);
 router.get("/downloads", downloads.list);
 router.get("/homepage-content", homepage.get);
+router.get("/state-exports", market.listStateExports);
+router.get("/top-products", market.listTopProducts);
+router.get("/country-products", market.listCountryProducts);
 
 router.post("/enquiries", publicWriteLimiter, enquiry.create);
 router.post("/newsletter/subscribe", publicWriteLimiter, newsletter.subscribe);

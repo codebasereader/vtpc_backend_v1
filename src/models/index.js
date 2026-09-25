@@ -15,6 +15,9 @@ const Download = require("./Download");
 const HomepageContent = require("./HomepageContent");
 const NewsletterSubscriber = require("./NewsletterSubscriber");
 const AdminUser = require("./AdminUser");
+const StateExport = require("./StateExport");
+const TopProduct = require("./TopProduct");
+const CountryProduct = require("./CountryProduct");
 
 module.exports = {
   Page,
@@ -34,4 +37,7 @@ module.exports = {
   HomepageContent,
   NewsletterSubscriber,
   AdminUser,
+  StateExport,
+  TopProduct,
+  CountryProduct,
 };
