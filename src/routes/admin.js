@@ -14,6 +14,8 @@ const {
   offices,
   staff,
   events,
+  taluks,
+  warehouses,
   downloads,
 } = require("../controllers/resourcesController");
 const { requireAuth } = require("../middleware/auth");
@@ -86,6 +88,14 @@ router.delete("/staff/:id", staff.remove);
 router.post("/events", events.create);
 router.put("/events/:id", events.update);
 router.delete("/events/:id", events.remove);
+
+router.post("/taluks", taluks.create);
+router.put("/taluks/:id", taluks.update);
+router.delete("/taluks/:id", taluks.remove);
+
+router.post("/warehouses", warehouses.create);
+router.put("/warehouses/:id", warehouses.update);
+router.delete("/warehouses/:id", warehouses.remove);
 
 router.post("/downloads", setUploadFolders({ file: "downloads", fileUrl: "downloads" }), upload.any(), downloads.create);
 router.put("/downloads/:id", setUploadFolders({ file: "downloads", fileUrl: "downloads" }), upload.any(), downloads.update);

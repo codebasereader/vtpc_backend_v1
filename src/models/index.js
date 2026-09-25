@@ -9,6 +9,8 @@ const StaffMember = require("./StaffMember");
 const Event = require("./Event");
 const City = require("./City");
 const EventSector = require("./EventSector");
+const Taluk = require("./Taluk");
+const Warehouse = require("./Warehouse");
 const Download = require("./Download");
 const HomepageContent = require("./HomepageContent");
 const NewsletterSubscriber = require("./NewsletterSubscriber");
@@ -26,6 +28,8 @@ module.exports = {
   Event,
   City,
   EventSector,
+  Taluk,
+  Warehouse,
   Download,
   HomepageContent,
   NewsletterSubscriber,

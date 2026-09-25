@@ -13,6 +13,8 @@ const {
   offices,
   staff,
   events,
+  taluks,
+  warehouses,
   downloads,
 } = require("../controllers/resourcesController");
 const { publicWriteLimiter } = require("../middleware/rateLimit");
@@ -33,6 +35,8 @@ router.get("/offices", offices.list);
 router.get("/staff", staff.list);
 router.get("/events", events.list);
 router.get("/events/:id", events.get);
+router.get("/taluks", taluks.list);
+router.get("/warehouses", warehouses.list);
 router.get("/downloads", downloads.list);
 router.get("/homepage-content", homepage.get);
 

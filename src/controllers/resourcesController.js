@@ -8,6 +8,8 @@ const {
   Office,
   StaffMember,
   Event,
+  Taluk,
+  Warehouse,
   Download,
 } = require("../models");
 const { makeCrud } = require("./crud");
@@ -63,6 +65,16 @@ const events = makeCrud(Event, {
   sort: { startDate: 1 },
 });
 
+const taluks = makeCrud(Taluk, {
+  label: "Taluk",
+  sort: { name: 1 },
+});
+
+const warehouses = makeCrud(Warehouse, {
+  label: "Warehouse",
+  sort: { name: 1 },
+});
+
 const downloads = makeCrud(Download, {
   label: "Download",
   sort: { uploadedAt: -1 },
@@ -79,5 +91,7 @@ module.exports = {
   offices,
   staff,
   events,
+  taluks,
+  warehouses,
   downloads,
 };
