@@ -16,4 +16,12 @@ const loginLimiter = rateLimit({
   message: { message: "Too many login attempts, please try again later" },
 });
 
-module.exports = { publicWriteLimiter, loginLimiter };
+const visitTrackLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 120,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: "Too many requests, please try again later" },
+});
+
+module.exports = { publicWriteLimiter, loginLimiter, visitTrackLimiter };

@@ -3,6 +3,8 @@ const page = require("../controllers/pageController");
 const homepage = require("../controllers/homepageController");
 const enquiry = require("../controllers/enquiryController");
 const newsletter = require("../controllers/newsletterController");
+const newsletterIssues = require("../controllers/newsletterIssueController");
+const visits = require("../controllers/visitController");
 const uploadCtrl = require("../controllers/uploadController");
 const {
   leaders,
@@ -29,6 +31,7 @@ router.use(requireAuth);
 
 router.post("/uploads", uploadCtrl.fromQueryFolder, upload.single("file"), uploadCtrl.create);
 
+router.get("/pages", page.list);
 router.post("/pages", page.create);
 router.put("/pages/:id", page.update);
 router.delete("/pages/:id", page.remove);
@@ -111,6 +114,12 @@ router.put("/homepage-content", homepage.update);
 
 router.get("/newsletter/subscribers", newsletter.list);
 router.get("/newsletter/subscribers/export", newsletter.exportCsv);
+router.get("/newsletter/issues", newsletterIssues.list);
+router.post("/newsletter/issues", newsletterIssues.create);
+router.post("/newsletter/issues/:id/send", newsletterIssues.send);
+router.delete("/newsletter/issues/:id", newsletterIssues.remove);
+
+router.get("/visits/daily", visits.daily);
 
 router.post("/state-exports/bulk-replace", market.replaceStateExports);
 router.post("/top-products/bulk-replace", market.replaceTopProducts);

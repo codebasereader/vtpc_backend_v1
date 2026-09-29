@@ -3,6 +3,8 @@ const page = require("../controllers/pageController");
 const homepage = require("../controllers/homepageController");
 const enquiry = require("../controllers/enquiryController");
 const newsletter = require("../controllers/newsletterController");
+const visits = require("../controllers/visitController");
+const lastUpdated = require("../controllers/lastUpdatedController");
 const {
   leaders,
   districts,
@@ -20,7 +22,7 @@ const {
 } = require("../controllers/resourcesController");
 const market = require("../controllers/marketIntelligenceController");
 const downloadFile = require("../controllers/downloadFileController");
-const { publicWriteLimiter } = require("../middleware/rateLimit");
+const { publicWriteLimiter, visitTrackLimiter } = require("../middleware/rateLimit");
 
 const router = express.Router();
 
@@ -47,8 +49,11 @@ router.get("/homepage-content", homepage.get);
 router.get("/state-exports", market.listStateExports);
 router.get("/top-products", market.listTopProducts);
 router.get("/country-products", market.listCountryProducts);
+router.get("/last-updated", lastUpdated.lastUpdated);
+router.get("/visits/summary", visits.summary);
 
 router.post("/enquiries", publicWriteLimiter, enquiry.create);
 router.post("/newsletter/subscribe", publicWriteLimiter, newsletter.subscribe);
+router.post("/visits/track", visitTrackLimiter, visits.track);
 
 module.exports = router;

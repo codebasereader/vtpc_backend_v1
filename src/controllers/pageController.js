@@ -14,6 +14,7 @@ const getBySlug = asyncHandler(async (req, res) => {
 
 module.exports = {
   getBySlug,
+  list: admin.list,
   create: admin.create,
   update: admin.update,
   remove: admin.remove,

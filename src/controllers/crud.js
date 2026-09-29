@@ -9,7 +9,7 @@ function getPath(obj, path) {
   return path.split(".").reduce((acc, key) => (acc == null ? acc : acc[key]), obj);
 }
 
-function applySlugFields(body, { slugField, slugFrom } = {}) {
+function applySlugFields(body, { slugField, slugFrom, generateIfMissing = true } = {}) {
   if (!slugField) {
     delete body.id;
     return body;
@@ -17,12 +17,14 @@ function applySlugFields(body, { slugField, slugFrom } = {}) {
   if (body.id && !body[slugField] && !isObjectId(body.id)) {
     body[slugField] = toSlug(body.id);
   }
-  if (!body[slugField] && slugFrom) {
+  if (generateIfMissing && !body[slugField] && slugFrom) {
     const source = getPath(body, slugFrom);
     if (source) body[slugField] = toSlug(source);
   }
   if (body[slugField]) {
     body[slugField] = toSlug(body[slugField]);
+  } else {
+    delete body[slugField];
   }
   delete body.id;
   return body;
@@ -39,10 +41,10 @@ function makeCrud(Model, options = {}) {
 
   const fileKeys = Object.keys(fileFields);
 
-  function incoming(req) {
+  function incoming(req, { generateSlug = true } = {}) {
     const body = parseRequestBody(req.body || {});
     applyUploadedFiles(req, body, fileFields);
-    applySlugFields(body, { slugField, slugFrom });
+    applySlugFields(body, { slugField, slugFrom, generateIfMissing: generateSlug });
     return body;
   }
 
@@ -63,14 +65,14 @@ function makeCrud(Model, options = {}) {
     }),
 
     create: asyncHandler(async (req, res) => {
-      const body = incoming(req);
+      const body = incoming(req, { generateSlug: true });
       const doc = await Model.create(body);
       sendJson(res, doc.toJSON(), 201);
     }),
 
     update: asyncHandler(async (req, res) => {
       const doc = await findByParamOrThrow(Model, req.params.id, slugField, label);
-      const body = incoming(req);
+      const body = incoming(req, { generateSlug: false });
       for (const key of fileKeys) {
         if (body[key] && body[key] !== doc[key]) {
           deleteLocal(doc[key]);

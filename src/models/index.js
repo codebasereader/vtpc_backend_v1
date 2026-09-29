@@ -15,7 +15,9 @@ const Download = require("./Download");
 const DownloadCategory = require("./DownloadCategory");
 const HomepageContent = require("./HomepageContent");
 const NewsletterSubscriber = require("./NewsletterSubscriber");
+const NewsletterIssue = require("./NewsletterIssue");
 const AdminUser = require("./AdminUser");
+const SiteVisit = require("./SiteVisit");
 const StateExport = require("./StateExport");
 const TopProduct = require("./TopProduct");
 const CountryProduct = require("./CountryProduct");
@@ -38,7 +40,9 @@ module.exports = {
   DownloadCategory,
   HomepageContent,
   NewsletterSubscriber,
+  NewsletterIssue,
   AdminUser,
+  SiteVisit,
   StateExport,
   TopProduct,
   CountryProduct,
