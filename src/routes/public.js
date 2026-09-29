@@ -15,9 +15,11 @@ const {
   events,
   taluks,
   warehouses,
+  downloadCategories,
   downloads,
 } = require("../controllers/resourcesController");
 const market = require("../controllers/marketIntelligenceController");
+const downloadFile = require("../controllers/downloadFileController");
 const { publicWriteLimiter } = require("../middleware/rateLimit");
 
 const router = express.Router();
@@ -38,7 +40,9 @@ router.get("/events", events.list);
 router.get("/events/:id", events.get);
 router.get("/taluks", taluks.list);
 router.get("/warehouses", warehouses.list);
+router.get("/download-categories", downloadCategories.list);
 router.get("/downloads", downloads.list);
+router.get("/downloads/:id/file", downloadFile.sendAttachment);
 router.get("/homepage-content", homepage.get);
 router.get("/state-exports", market.listStateExports);
 router.get("/top-products", market.listTopProducts);

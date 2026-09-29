@@ -12,6 +12,7 @@ const EventSector = require("./EventSector");
 const Taluk = require("./Taluk");
 const Warehouse = require("./Warehouse");
 const Download = require("./Download");
+const DownloadCategory = require("./DownloadCategory");
 const HomepageContent = require("./HomepageContent");
 const NewsletterSubscriber = require("./NewsletterSubscriber");
 const AdminUser = require("./AdminUser");
@@ -34,6 +35,7 @@ module.exports = {
   Taluk,
   Warehouse,
   Download,
+  DownloadCategory,
   HomepageContent,
   NewsletterSubscriber,
   AdminUser,

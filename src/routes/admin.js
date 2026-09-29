@@ -16,6 +16,7 @@ const {
   events,
   taluks,
   warehouses,
+  downloadCategories,
   downloads,
 } = require("../controllers/resourcesController");
 const market = require("../controllers/marketIntelligenceController");
@@ -97,6 +98,10 @@ router.delete("/taluks/:id", taluks.remove);
 router.post("/warehouses", warehouses.create);
 router.put("/warehouses/:id", warehouses.update);
 router.delete("/warehouses/:id", warehouses.remove);
+
+router.post("/download-categories", downloadCategories.create);
+router.put("/download-categories/:id", downloadCategories.update);
+router.delete("/download-categories/:id", downloadCategories.remove);
 
 router.post("/downloads", setUploadFolders({ file: "downloads", fileUrl: "downloads" }), upload.any(), downloads.create);
 router.put("/downloads/:id", setUploadFolders({ file: "downloads", fileUrl: "downloads" }), upload.any(), downloads.update);

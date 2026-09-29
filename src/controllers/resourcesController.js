@@ -11,6 +11,7 @@ const {
   Taluk,
   Warehouse,
   Download,
+  DownloadCategory,
 } = require("../models");
 const { makeCrud } = require("./crud");
 
@@ -75,9 +76,14 @@ const warehouses = makeCrud(Warehouse, {
   sort: { name: 1 },
 });
 
+const downloadCategories = makeCrud(DownloadCategory, {
+  label: "Download category",
+  sort: { order: 1 },
+});
+
 const downloads = makeCrud(Download, {
   label: "Download",
-  sort: { uploadedAt: -1 },
+  sort: { order: 1, uploadedAt: 1 },
   fileFields: { fileUrl: "downloads" },
 });
 
@@ -93,5 +99,6 @@ module.exports = {
   events,
   taluks,
   warehouses,
+  downloadCategories,
   downloads,
 };

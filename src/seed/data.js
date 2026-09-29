@@ -229,32 +229,7 @@ const events = [
   },
 ];
 
-const downloads = [
-  {
-    title: bilingual("Industrial Policy 2025-2030"),
-    category: "Policy",
-    fileUrl: "/uploads/downloads/industrial-policy-2025-2030.pdf",
-    uploadedAt: new Date("2025-06-01T00:00:00.000Z"),
-  },
-  {
-    title: bilingual("RTI Manual"),
-    category: "RTI",
-    fileUrl: "/uploads/downloads/rti-manual.pdf",
-    uploadedAt: new Date("2025-04-01T00:00:00.000Z"),
-  },
-  {
-    title: bilingual("Annual Report 2024-25"),
-    category: "Report",
-    fileUrl: "/uploads/downloads/annual-report-2024-25.pdf",
-    uploadedAt: new Date("2025-08-15T00:00:00.000Z"),
-  },
-  {
-    title: bilingual("Exporter Registration Form"),
-    category: "Form",
-    fileUrl: "/uploads/downloads/exporter-registration-form.pdf",
-    uploadedAt: new Date("2025-03-01T00:00:00.000Z"),
-  },
-];
+const downloads = [];
 
 const homepage = {
   hero: {
