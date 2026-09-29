@@ -7,6 +7,7 @@ const giProductSchema = new mongoose.Schema(
     slug: { type: String, required: true, unique: true, lowercase: true, trim: true },
     name: { type: bilingualSchema, default: () => ({}) },
     category: { type: String, default: "" },
+    featured: { type: Boolean, default: false },
     image: { type: String, default: "" },
     video: { type: String, default: "" },
     summary: { type: bilingualSchema, default: () => ({}) },
