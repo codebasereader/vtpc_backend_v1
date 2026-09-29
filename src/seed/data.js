@@ -1,4 +1,5 @@
 const { bilingual } = require("../utils/slug");
+const focusSectors = require("../../data/focus-sectors.json");
 
 const PAGE_SLUGS = [
   ["privacy-policies", "Privacy Policy"],
@@ -122,128 +123,7 @@ const districts = [
   district("yadgir", "Yadgir", "Paddy and pulses"),
 ];
 
-const focusSectors = [
-  {
-    slug: "pharmaceutical-biotech",
-    name: bilingual("Pharmaceutical & Biotech"),
-    image: "/uploads/focus-sectors/pharmaceutical-biotech.jpg",
-    description: bilingual("Karnataka is among India’s leading pharmaceutical and biotech exporters, anchored by Bengaluru’s research ecosystem."),
-    statBoxes: [
-      { value: "40%", label: bilingual("of Pharma products exported overseas") },
-      { value: "150+", label: bilingual("biotech companies in the state") },
-    ],
-    yearlyChart: [
-      { year: "FY-2021", valueUsdMn: 812.4 },
-      { year: "FY-2022", valueUsdMn: 941.1 },
-      { year: "FY-2023", valueUsdMn: 1039.27 },
-    ],
-    topMarkets: [
-      { country: "USA", percentage: 31.93 },
-      { country: "UK", percentage: 9.8 },
-      { country: "Germany", percentage: 7.4 },
-    ],
-    keyInsights: bilingual("Formulations, biosimilars and contract research continue to drive growth. Regulatory support and cluster infrastructure remain the state’s edge."),
-  },
-  {
-    slug: "it-ites",
-    name: bilingual("IT & ITeS"),
-    image: "/uploads/focus-sectors/it-ites.jpg",
-    description: bilingual("Bengaluru remains India’s principal gateway for software, GCC and digital services exports."),
-    statBoxes: [{ value: "#1", label: bilingual("IT export destination in India") }],
-    yearlyChart: [
-      { year: "FY-2022", valueUsdMn: 52000 },
-      { year: "FY-2023", valueUsdMn: 58000 },
-    ],
-    topMarkets: [
-      { country: "USA", percentage: 54 },
-      { country: "Europe", percentage: 22 },
-    ],
-    keyInsights: bilingual("Global capability centres, SaaS and engineering R&D are expanding beyond Bengaluru into Mysuru, Hubballi and Mangaluru."),
-  },
-  {
-    slug: "tourism-hospitality",
-    name: bilingual("Tourism & Hospitality"),
-    image: "/uploads/focus-sectors/tourism-hospitality.jpg",
-    description: bilingual("Heritage, eco-tourism and MICE continue to position Karnataka as a services export and inbound tourism leader."),
-    statBoxes: [{ value: "5", label: bilingual("UNESCO World Heritage sites") }],
-    yearlyChart: [{ year: "FY-2023", valueUsdMn: 420 }],
-    topMarkets: [
-      { country: "UK", percentage: 18 },
-      { country: "France", percentage: 12 },
-    ],
-    keyInsights: bilingual("Hampi, Coorg, coastal circuits and Bengaluru MICE together form the core offering for international visitors."),
-  },
-  {
-    slug: "engineering-auto",
-    name: bilingual("Engineering & Auto Components"),
-    image: "/uploads/focus-sectors/engineering-auto.jpg",
-    description: bilingual("Foundries, machine tools and auto-component clusters in Belagavi, Dharwad and Bengaluru feed global OEMs."),
-    statBoxes: [{ value: "12%", label: bilingual("share of merchandise exports") }],
-    yearlyChart: [{ year: "FY-2023", valueUsdMn: 2100 }],
-    topMarkets: [
-      { country: "Germany", percentage: 16 },
-      { country: "USA", percentage: 14 },
-    ],
-    keyInsights: bilingual("Precision manufacturing and EV supply-chain investment are the near-term growth levers."),
-  },
-];
-
-const giProducts = [
-  {
-    slug: "bidriware",
-    name: bilingual("Bidriware"),
-    category: "Handicraft",
-    image: "/uploads/gi-products/bidriware.jpg",
-    video: "/uploads/gi-videos/bidriware.mp4",
-    summary: bilingual("Silver-inlaid zinc alloy ware from Bidar, one of Karnataka’s best-known GI handicrafts."),
-    story: bilingual("Bidriware is cast from a zinc-copper alloy, oxidised to a deep black, then inlaid with pure silver. The craft is centred in Bidar and is a registered Geographical Indication of Karnataka."),
-  },
-  {
-    slug: "channapatna-toys",
-    name: bilingual("Channapatna Toys"),
-    category: "Handicraft",
-    image: "/uploads/gi-products/channapatna-toys.jpg",
-    video: "/uploads/gi-videos/channapatna-toys.mp4",
-    summary: bilingual("Lacquered wooden toys from Ramanagara district, turned on lathes and finished with natural dyes."),
-    story: bilingual("Channapatna’s toy-making tradition uses ivory wood (Aale mara) and vegetable dyes. The cluster supplies domestic and export markets and holds a GI tag."),
-  },
-  {
-    slug: "mysore-silk",
-    name: bilingual("Mysore Silk"),
-    category: "Textile",
-    image: "/uploads/gi-products/mysore-silk.jpg",
-    video: "",
-    summary: bilingual("Pure mulberry silk sarees and fabrics produced by KSIC, known for gold zari and rich colour."),
-    story: bilingual("Mysore Silk is produced under the Karnataka Silk Industries Corporation. The GI protects the distinctive weave, zari work and finishing associated with Mysuru."),
-  },
-  {
-    slug: "ilkal-saree",
-    name: bilingual("Ilkal Saree"),
-    category: "Textile",
-    image: "/uploads/gi-products/ilkal-saree.jpg",
-    video: "",
-    summary: bilingual("Distinctive cotton-silk sarees from Ilkal in Bagalkote, recognised by the tope teni joining technique."),
-    story: bilingual("Ilkal sarees use a unique weft-join (tope teni) and bold temple borders. The weaving town of Ilkal has practised this craft for centuries."),
-  },
-  {
-    slug: "coorg-orange",
-    name: bilingual("Coorg Orange"),
-    category: "Agriculture",
-    image: "/uploads/gi-products/coorg-orange.jpg",
-    video: "",
-    summary: bilingual("Loose-jacket oranges grown in the Kodagu hills, a registered agricultural GI of Karnataka."),
-    story: bilingual("Coorg Orange (Kodagu kittale) is grown in the unique climate of the Western Ghats. The GI covers the geographic area of Kodagu district."),
-  },
-  {
-    slug: "dharwad-pedha",
-    name: bilingual("Dharwad Pedha"),
-    category: "Food",
-    image: "/uploads/gi-products/dharwad-pedha.jpg",
-    video: "",
-    summary: bilingual("Caramelised milk sweet from Dharwad, traditionally associated with the Thakur family recipe."),
-    story: bilingual("Dharwad Pedha is a slow-cooked khoa sweet with a characteristic brown crust. The GI is linked to Dharwad city and its historic makers."),
-  },
-];
+const giProducts = [];
 
 const offices = [
   {

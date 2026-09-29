@@ -41,6 +41,10 @@ function uniqueValue(row, uniqueKey) {
 }
 
 async function replaceCollection(Model, rows, uniqueKey) {
+  if (!rows.length) {
+    console.log(`${Model.modelName}: skipped (no seed rows)`);
+    return;
+  }
   for (const row of rows) {
     const filter = { [uniqueKey]: uniqueValue(row, uniqueKey) };
     await Model.findOneAndUpdate(filter, row, {
@@ -106,6 +110,12 @@ async function seed() {
   await replaceCollection(District, data.districts, "slug");
   await replaceCollection(City, data.cities, "slug");
   await replaceCollection(FocusSector, data.focusSectors, "slug");
+  const removedSectors = await FocusSector.deleteMany({
+    slug: { $nin: data.focusSectors.map((row) => row.slug) },
+  });
+  if (removedSectors.deletedCount) {
+    console.log(`FocusSector: removed ${removedSectors.deletedCount} obsolete placeholder(s)`);
+  }
   await replaceCollection(EventSector, data.eventSectors, "slug");
   await replaceCollection(GIProduct, data.giProducts, "slug");
   await replaceCollection(Office, data.offices, "city");

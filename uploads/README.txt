@@ -27,9 +27,13 @@ gi-videos/          (optional)
 
 focus-sectors/
   pharmaceutical-biotech.jpg
-  it-ites.jpg
-  tourism-hospitality.jpg
-  engineering-auto.jpg
+  electrical-machinery-equipment.jpg
+  ready-made-garments.jpg
+  automobile.jpg
+  organic-chemicals.jpg
+  aerospace.jpg
+  optical-and-medical.jpg
+  food-products.jpg
 
 downloads/
   industrial-policy-2025-2030.pdf
