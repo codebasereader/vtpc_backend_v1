@@ -13,8 +13,11 @@ const FOLDERS = [
   "gi-videos",
   "focus-sectors",
   "downloads",
+  "newsletters",
   "misc",
 ];
+
+const NEWSLETTER_PDF_MAX_BYTES = 10 * 1024 * 1024;
 
 const ALLOWED_FOLDERS = new Set(FOLDERS);
 
@@ -147,18 +150,55 @@ function reqFolder(file) {
   return ALLOWED_FOLDERS.has(parent) ? parent : "misc";
 }
 
-function deleteLocal(urlOrPath) {
-  if (!urlOrPath || typeof urlOrPath !== "string") return;
+function absoluteDiskPath(urlOrPath) {
+  if (!urlOrPath || typeof urlOrPath !== "string") return null;
   const relative = urlOrPath.replace(env.publicBaseUrl, "");
-  if (!relative.startsWith("/uploads/")) return;
-  const abs = path.join(env.uploadsDir, relative.replace(/^\/uploads\/?/, ""));
-  if (!abs.startsWith(env.uploadsDir)) return;
+  if (!relative.startsWith("/uploads/")) return null;
+  const abs = path.resolve(env.uploadsDir, relative.replace(/^\/uploads\/?/, ""));
+  const root = path.resolve(env.uploadsDir);
+  if (abs !== root && !abs.startsWith(root + path.sep)) return null;
+  return abs;
+}
+
+function deleteLocal(urlOrPath) {
+  const abs = absoluteDiskPath(urlOrPath);
+  if (!abs) return;
   fs.unlink(abs, () => {});
+}
+
+function originalFileName(file) {
+  const name = path.basename(String(file?.originalname || "").replace(/\\/g, "/"));
+  return name || "newsletter.pdf";
+}
+
+function assertNewsletterPdf(req, res, next) {
+  const files = collectFiles(req);
+  const unexpected = files.filter((file) => file.fieldname !== "attachment");
+  if (unexpected.length) {
+    for (const file of unexpected) fs.unlink(file.path, () => {});
+    return next(new HttpError(400, "Only a PDF attachment is allowed"));
+  }
+  const file = files.find((item) => item.fieldname === "attachment");
+  if (!file) return next();
+
+  const mime = String(file.mimetype || "").toLowerCase();
+  const ext = path.extname(file.originalname || "").toLowerCase();
+  const isPdf = mime === "application/pdf" || ext === ".pdf";
+  if (!isPdf) {
+    fs.unlink(file.path, () => {});
+    return next(new HttpError(400, "Newsletter attachment must be a PDF"));
+  }
+  if (file.size > NEWSLETTER_PDF_MAX_BYTES) {
+    fs.unlink(file.path, () => {});
+    return next(new HttpError(400, "Newsletter PDF must be 10 MB or smaller"));
+  }
+  next();
 }
 
 module.exports = {
   FOLDERS,
   ALLOWED_FOLDERS,
+  NEWSLETTER_PDF_MAX_BYTES,
   ensureUploadDirs,
   upload,
   setUploadFolder,
@@ -167,5 +207,9 @@ module.exports = {
   applyUploadedFiles,
   storedUrl,
   deleteLocal,
+  absoluteDiskPath,
+  collectFiles,
+  originalFileName,
+  assertNewsletterPdf,
   publicPathFor,
 };

@@ -37,12 +37,12 @@ Default editor login (change immediately):
 
 1. **Dedicated upload** (recommended for images/video)  
    `POST /admin/uploads?folder=leaders` as `multipart/form-data` field `file`  
-   Allowed folders: `leaders`, `staff`, `gi-products`, `gi-videos`, `focus-sectors`, `downloads`, `misc`  
+   Allowed folders: `leaders`, `staff`, `gi-products`, `gi-videos`, `focus-sectors`, `downloads`, `newsletters`, `misc`  
    Response: `{ "url": "https://api.../uploads/leaders/....jpg", "path": "/uploads/leaders/....jpg" }`  
    Then send that `url` in the normal JSON create/update body (`photo`, `image`, `video`, `fileUrl`).
 
 2. **Direct multipart on the write endpoint**  
-   `POST /admin/downloads` (and leaders / staff / GI / focus-sectors) as `multipart/form-data` with the file field (`file` / `photo` / `image` / `video`) plus the other fields. Nested objects can be JSON strings (`title={"en":"...","kn":""}`) or `title[en]`.
+   `POST /admin/downloads` (and leaders / staff / GI / focus-sectors / newsletter issues) as `multipart/form-data` with the file field (`file` / `photo` / `image` / `video` / `attachment`) plus the other fields. Nested objects can be JSON strings (`title={"en":"...","kn":""}`) or `title[en]`. Newsletter PDFs are stored under `uploads/newsletters/`, must be `application/pdf`, and are capped at 10 MB. They are not image-optimised.
 
 Returned URLs are public. The citizen site loads them directly; no auth.
 

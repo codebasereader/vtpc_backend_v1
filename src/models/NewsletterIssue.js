@@ -7,8 +7,16 @@ const newsletterIssueSchema = new mongoose.Schema(
     body: { type: String, required: true },
     month: { type: Number, required: true, min: 1, max: 12 },
     year: { type: Number, required: true },
+    attachment: { type: String, default: "" },
+    attachmentName: { type: String, default: "" },
     sentAt: { type: Date, default: null },
     recipientCount: { type: Number, default: null },
+    sentBy: { type: String, default: "" },
+    status: {
+      type: String,
+      enum: ["draft", "sending", "sent", "failed"],
+      default: "draft",
+    },
   },
   { timestamps: true }
 );

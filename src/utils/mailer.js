@@ -18,17 +18,18 @@ function createTransport() {
   });
 }
 
-async function sendHtmlMail({ to, subject, html }) {
+async function sendHtmlMail({ to, subject, html, attachments = [] }) {
   const transport = createTransport();
   await transport.sendMail({
     from: env.smtp.from,
     to,
     subject,
     html,
+    attachments: attachments.length ? attachments : undefined,
   });
 }
 
-async function sendHtmlMailBatch(recipients, { subject, html }, batchSize = 25) {
+async function sendHtmlMailBatch(recipients, { subject, html, attachments = [] }, batchSize = 25) {
   const transport = createTransport();
   let sent = 0;
   for (let i = 0; i < recipients.length; i += batchSize) {
@@ -40,6 +41,7 @@ async function sendHtmlMailBatch(recipients, { subject, html }, batchSize = 25) 
           to,
           subject,
           html,
+          attachments: attachments.length ? attachments : undefined,
         })
       )
     );

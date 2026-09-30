@@ -23,7 +23,12 @@ const {
 } = require("../controllers/resourcesController");
 const market = require("../controllers/marketIntelligenceController");
 const { requireAuth } = require("../middleware/auth");
-const { upload, setUploadFolders, optimizeUploadedImages } = require("../utils/upload");
+const {
+  upload,
+  setUploadFolders,
+  optimizeUploadedImages,
+  assertNewsletterPdf,
+} = require("../utils/upload");
 
 const router = express.Router();
 
@@ -115,7 +120,13 @@ router.put("/homepage-content", homepage.update);
 router.get("/newsletter/subscribers", newsletter.list);
 router.get("/newsletter/subscribers/export", newsletter.exportCsv);
 router.get("/newsletter/issues", newsletterIssues.list);
-router.post("/newsletter/issues", newsletterIssues.create);
+router.post(
+  "/newsletter/issues",
+  setUploadFolders({ attachment: "newsletters" }),
+  upload.any(),
+  assertNewsletterPdf,
+  newsletterIssues.create
+);
 router.post("/newsletter/issues/:id/send", newsletterIssues.send);
 router.delete("/newsletter/issues/:id", newsletterIssues.remove);
 

@@ -24,7 +24,13 @@ const subscribe = asyncHandler(async (req, res) => {
 
 const list = asyncHandler(async (req, res) => {
   const rows = await NewsletterSubscriber.find().sort({ createdAt: -1 });
-  res.json(rows.map((row) => ({ email: row.email })));
+  res.json(
+    rows.map((row) => ({
+      id: String(row._id),
+      email: row.email,
+      createdAt: row.createdAt ? row.createdAt.toISOString() : null,
+    }))
+  );
 });
 
 const exportCsv = asyncHandler(async (req, res) => {

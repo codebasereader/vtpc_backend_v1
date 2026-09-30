@@ -1,6 +1,6 @@
 const env = require("../config/env");
 
-const FILE_FIELDS = ["photo", "image", "video", "fileUrl"];
+const FILE_FIELDS = ["photo", "image", "video", "fileUrl", "attachment"];
 
 function absoluteUrl(value) {
   if (!value) return value;

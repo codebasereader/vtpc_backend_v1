@@ -41,6 +41,8 @@ downloads/
   annual-report-2024-25.pdf
   exporter-registration-form.pdf
 
+newsletters/        (CMS newsletter issue PDFs; timestamp-prefixed)
+
 misc/               (generic POST /admin/uploads?folder=misc)
 
 CMS uploads are stored with a timestamp prefix, e.g.
