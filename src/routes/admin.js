@@ -3,6 +3,7 @@ const page = require("../controllers/pageController");
 const homepage = require("../controllers/homepageController");
 const enquiry = require("../controllers/enquiryController");
 const contactEnquiry = require("../controllers/contactEnquiryController");
+const forms = require("../controllers/formController");
 const newsletter = require("../controllers/newsletterController");
 const newsletterIssues = require("../controllers/newsletterIssueController");
 const visits = require("../controllers/visitController");
@@ -91,6 +92,15 @@ router.patch("/enquiries/:id", enquiry.updateContacted);
 
 router.get("/contact-enquiries", contactEnquiry.list);
 router.patch("/contact-enquiries/:id", contactEnquiry.updateContacted);
+
+router.get("/forms", forms.listAdmin);
+router.post("/forms", forms.create);
+router.get("/forms/:id/responses", forms.listResponses);
+router.delete("/forms/:id/responses/:responseId", forms.removeResponse);
+router.get("/forms/:id", forms.getAdmin);
+router.put("/forms/:id", forms.replace);
+router.patch("/forms/:id", forms.patchActive);
+router.delete("/forms/:id", forms.remove);
 
 router.post("/offices", offices.create);
 router.put("/offices/:id", offices.update);

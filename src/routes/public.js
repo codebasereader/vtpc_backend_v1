@@ -3,6 +3,7 @@ const page = require("../controllers/pageController");
 const homepage = require("../controllers/homepageController");
 const enquiry = require("../controllers/enquiryController");
 const contactEnquiry = require("../controllers/contactEnquiryController");
+const forms = require("../controllers/formController");
 const newsletter = require("../controllers/newsletterController");
 const visits = require("../controllers/visitController");
 const lastUpdated = require("../controllers/lastUpdatedController");
@@ -52,6 +53,10 @@ router.get("/top-products", market.listTopProducts);
 router.get("/country-products", market.listCountryProducts);
 router.get("/last-updated", lastUpdated.lastUpdated);
 router.get("/visits/summary", visits.summary);
+
+router.get("/forms/active", forms.listActive);
+router.get("/forms/:slug", forms.getPublic);
+router.post("/forms/:slug/responses", publicWriteLimiter, forms.submitResponse);
 
 router.post("/enquiries", publicWriteLimiter, enquiry.create);
 router.post("/contact-enquiries", publicWriteLimiter, contactEnquiry.create);
