@@ -1,5 +1,25 @@
-const { Enquiry } = require("../models");
+const { Enquiry, GIProduct } = require("../models");
 const { asyncHandler, HttpError } = require("../utils/errors");
+const { findByParamOrThrow } = require("../utils/lookup");
+
+function contactedByLabel(user) {
+  if (!user) return "";
+  const name = String(user.name || "").trim();
+  const email = String(user.email || "").trim();
+  if (name && email) return `${name} <${email}>`;
+  return name || email;
+}
+
+function toEnquiryJson(row) {
+  const json = typeof row.toJSON === "function" ? row.toJSON() : row;
+  return {
+    ...json,
+    contacted: Boolean(json.contacted),
+    contactedAt: json.contactedAt || null,
+    contactedBy: json.contactedBy || "",
+    productName: json.productName || "",
+  };
+}
 
 const create = asyncHandler(async (req, res) => {
   const { productId, name, email, phone, message } = req.body || {};
@@ -7,8 +27,15 @@ const create = asyncHandler(async (req, res) => {
     throw new HttpError(400, "productId, name, email and message are required");
   }
 
+  const slug = String(productId).trim().toLowerCase();
+  const product = await GIProduct.findOne({ slug });
+  if (!product) {
+    throw new HttpError(400, "Unknown GI product");
+  }
+
   await Enquiry.create({
-    productId: String(productId).trim(),
+    productId: slug,
+    productName: String(product.name?.en || product.slug || slug).trim(),
     name: String(name).trim(),
     email: String(email).trim().toLowerCase(),
     phone: phone ? String(phone).trim() : "",
@@ -20,7 +47,24 @@ const create = asyncHandler(async (req, res) => {
 
 const list = asyncHandler(async (req, res) => {
   const rows = await Enquiry.find().sort({ createdAt: -1 });
-  res.json(rows.map((row) => row.toJSON()));
+  res.json(rows.map(toEnquiryJson));
 });
 
-module.exports = { create, list };
+const updateContacted = asyncHandler(async (req, res) => {
+  if (typeof req.body?.contacted !== "boolean") {
+    throw new HttpError(400, "contacted must be true or false");
+  }
+  const row = await findByParamOrThrow(Enquiry, req.params.id, null, "Enquiry");
+  row.contacted = req.body.contacted;
+  if (req.body.contacted) {
+    row.contactedAt = new Date();
+    row.contactedBy = contactedByLabel(req.user);
+  } else {
+    row.contactedAt = null;
+    row.contactedBy = "";
+  }
+  await row.save();
+  res.json(toEnquiryJson(row));
+});
+
+module.exports = { create, list, updateContacted };

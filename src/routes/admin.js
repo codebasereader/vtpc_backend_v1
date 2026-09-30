@@ -86,6 +86,7 @@ router.put(
 router.delete("/gi-products/:id", giProducts.remove);
 
 router.get("/enquiries", enquiry.list);
+router.patch("/enquiries/:id", enquiry.updateContacted);
 
 router.post("/offices", offices.create);
 router.put("/offices/:id", offices.update);
