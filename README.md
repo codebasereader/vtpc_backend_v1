@@ -37,6 +37,12 @@ Default editor login (change immediately):
 
 Returned URLs are public. The citizen site loads them directly; no auth.
 
+JPEG/PNG uploads are converted to WebP (max 1920px wide, quality 82) before the path is saved. GIFs and files that are already WebP are left as-is. PDFs and Office documents in `downloads/` are never converted.
+
+Videos (including iPhone `.mov`) are saved immediately, then converted in the background to H.264/AAC MP4 (max 1280px wide). The document's `video` URL is swapped when conversion finishes. GI products also expose `videoStatus`: `"processing"` | `"ready"` | `"failed"`. Requires **ffmpeg** on the server.
+
+Existing files (except GI images already converted) can be batch-optimised with `npm run optimize:media`.
+
 Drop seed media into `uploads/` using the names in `uploads/README.txt`.
 
 ## Auth
@@ -67,7 +73,8 @@ If the Karnataka SVG uses different ids, change the `slug` (the API `id`) to mat
 
 ## EC2
 
-1. Install Node 20, nginx, and either local MongoDB or use Atlas (`MONGODB_URI`).
+1. Install Node 20, nginx, **ffmpeg**, and either local MongoDB or use Atlas (`MONGODB_URI`).
+   On Ubuntu: `sudo apt-get install -y ffmpeg`
 2. Clone this repo, `cp .env.example .env`, edit:
    - `NODE_ENV=production`
    - `PUBLIC_BASE_URL=https://your-api-host`

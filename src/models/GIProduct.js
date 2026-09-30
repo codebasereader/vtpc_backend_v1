@@ -10,6 +10,7 @@ const giProductSchema = new mongoose.Schema(
     featured: { type: Boolean, default: false },
     image: { type: String, default: "" },
     video: { type: String, default: "" },
+    videoStatus: { type: String, default: null },
     summary: { type: bilingualSchema, default: () => ({}) },
     story: { type: bilingualSchema, default: () => ({}) },
   },

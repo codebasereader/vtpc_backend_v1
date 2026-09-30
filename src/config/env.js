@@ -62,5 +62,13 @@ module.exports = {
     pass: process.env.SMTP_PASS || "",
     from: process.env.SMTP_FROM || process.env.ADMIN_EMAIL || "noreply@vtpc.gov.in",
   },
+  media: {
+    imageMaxWidth: Number(process.env.IMAGE_MAX_WIDTH) || 1920,
+    imageWebpQuality: Number(process.env.IMAGE_WEBP_QUALITY) || 82,
+    imageWebpEffort: Number(process.env.IMAGE_WEBP_EFFORT) || 5,
+    videoMaxWidth: Number(process.env.VIDEO_MAX_WIDTH) || 1280,
+    videoCrf: Number(process.env.VIDEO_CRF) || 23,
+    videoSkipMp4MaxBytes: 15 * 1024 * 1024,
+  },
   uploadsDir: path.resolve(__dirname, "../../uploads"),
 };

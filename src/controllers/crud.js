@@ -4,6 +4,7 @@ const { sendJson, toApi } = require("../utils/serialize");
 const { asyncHandler } = require("../utils/errors");
 const { findByParamOrThrow } = require("../utils/lookup");
 const { applyUploadedFiles, deleteLocal } = require("../utils/upload");
+const { scheduleVideoJobs } = require("../utils/optimizeVideo");
 
 function getPath(obj, path) {
   return path.split(".").reduce((acc, key) => (acc == null ? acc : acc[key]), obj);
@@ -67,6 +68,8 @@ function makeCrud(Model, options = {}) {
     create: asyncHandler(async (req, res) => {
       const body = incoming(req, { generateSlug: true });
       const doc = await Model.create(body);
+      scheduleVideoJobs(Model, doc);
+      if (doc.isModified()) await doc.save();
       sendJson(res, doc.toJSON(), 201);
     }),
 
@@ -80,6 +83,8 @@ function makeCrud(Model, options = {}) {
       }
       Object.assign(doc, body);
       await doc.save();
+      scheduleVideoJobs(Model, doc);
+      if (doc.isModified()) await doc.save();
       sendJson(res, doc.toJSON());
     }),
 

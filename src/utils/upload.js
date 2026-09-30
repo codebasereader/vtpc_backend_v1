@@ -4,6 +4,7 @@ const multer = require("multer");
 const env = require("../config/env");
 const { toSlug } = require("./slug");
 const { HttpError } = require("./errors");
+const { convertImageToWebp } = require("./optimizeImage");
 
 const FOLDERS = [
   "leaders",
@@ -17,7 +18,7 @@ const FOLDERS = [
 
 const ALLOWED_FOLDERS = new Set(FOLDERS);
 
-const IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+const IMAGE_TYPES = new Set(["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"]);
 const VIDEO_TYPES = new Set(["video/mp4", "video/webm", "video/quicktime"]);
 const DOC_TYPES = new Set([
   "application/pdf",
@@ -94,15 +95,33 @@ function setUploadFolders(map) {
   };
 }
 
-function applyUploadedFiles(req, body, fieldMap = {}) {
-  const files = req.files
-    ? Array.isArray(req.files)
-      ? req.files
-      : Object.values(req.files).flat()
-    : req.file
-      ? [req.file]
-      : [];
+function collectFiles(req) {
+  if (req.files) {
+    return Array.isArray(req.files) ? req.files : Object.values(req.files).flat();
+  }
+  return req.file ? [req.file] : [];
+}
 
+async function optimizeUploadedImages(req, res, next) {
+  const files = collectFiles(req);
+  for (const file of files) {
+    if (!file?.mimetype || !file.mimetype.startsWith("image/")) continue;
+    try {
+      const converted = await convertImageToWebp(file.path, file.mimetype);
+      if (converted) {
+        file.path = converted.path;
+        file.filename = converted.filename;
+        file.mimetype = converted.mimetype;
+      }
+    } catch (err) {
+      console.error("image optimize failed:", file.path, err.message);
+    }
+  }
+  next();
+}
+
+function applyUploadedFiles(req, body, fieldMap = {}) {
+  const files = collectFiles(req);
   for (const file of files) {
     let field = file.fieldname;
     if (field === "file") {
@@ -144,6 +163,7 @@ module.exports = {
   upload,
   setUploadFolder,
   setUploadFolders,
+  optimizeUploadedImages,
   applyUploadedFiles,
   storedUrl,
   deleteLocal,
