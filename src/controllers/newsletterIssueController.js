@@ -13,6 +13,7 @@ const {
   absoluteDiskPath,
 } = require("../utils/upload");
 
+const ACTIVE_SUBSCRIBER_FILTER = { status: { $ne: "blocked" } };
 const INLINE_SEND_LIMIT = 50;
 const sendQueue = [];
 let sendRunning = false;
@@ -43,7 +44,7 @@ function mailAttachmentsFor(issue) {
 async function deliverIssue(issueId) {
   const issue = await NewsletterIssue.findById(issueId);
   if (!issue || issue.sentAt) return;
-  const subscribers = await NewsletterSubscriber.find().select("email").lean();
+  const subscribers = await NewsletterSubscriber.find(ACTIVE_SUBSCRIBER_FILTER).select("email").lean();
   const emails = subscribers.map((row) => row.email).filter(Boolean);
   const recipientCount = await sendHtmlMailBatch(emails, {
     subject: issue.subject,
@@ -140,7 +141,7 @@ const send = asyncHandler(async (req, res) => {
   }
   mailAttachmentsFor(issue);
 
-  const subscriberCount = await NewsletterSubscriber.countDocuments();
+  const subscriberCount = await NewsletterSubscriber.countDocuments(ACTIVE_SUBSCRIBER_FILTER);
   issue.status = "sending";
   issue.sentBy = sentByLabel(req.user);
   await issue.save();

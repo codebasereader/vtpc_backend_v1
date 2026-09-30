@@ -119,6 +119,7 @@ router.put("/homepage-content", homepage.update);
 
 router.get("/newsletter/subscribers", newsletter.list);
 router.get("/newsletter/subscribers/export", newsletter.exportCsv);
+router.patch("/newsletter/subscribers/:id", newsletter.updateStatus);
 router.get("/newsletter/issues", newsletterIssues.list);
 router.post(
   "/newsletter/issues",
