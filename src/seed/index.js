@@ -100,6 +100,26 @@ async function migrateEvents() {
   }
 }
 
+const FOCUS_SECTOR_META = [
+  ["pharmaceutical-biotech", 0, "pill"],
+  ["electrical-machinery-equipment", 1, "zap"],
+  ["ready-made-garments", 2, "shirt"],
+  ["automobile", 3, "car"],
+  ["organic-chemicals", 4, "flask"],
+  ["aerospace", 5, "rocket"],
+  ["optical-and-medical", 6, "eye"],
+  ["food-products", 7, "wheat"],
+];
+
+async function backfillFocusSectorOrderAndIcons() {
+  let updated = 0;
+  for (const [slug, order, icon] of FOCUS_SECTOR_META) {
+    const result = await FocusSector.updateOne({ slug }, { $set: { order, icon } });
+    if (result.modifiedCount || result.matchedCount) updated += 1;
+  }
+  console.log(`FocusSector: backfilled order/icon on ${updated} sector(s)`);
+}
+
 async function seed() {
   await connectDb();
   await upsertAdmin();
@@ -110,6 +130,7 @@ async function seed() {
   await replaceCollection(District, data.districts, "slug");
   await replaceCollection(City, data.cities, "slug");
   await replaceCollection(FocusSector, data.focusSectors, "slug");
+  await backfillFocusSectorOrderAndIcons();
   const removedSectors = await FocusSector.deleteMany({
     slug: { $nin: data.focusSectors.map((row) => row.slug) },
   });

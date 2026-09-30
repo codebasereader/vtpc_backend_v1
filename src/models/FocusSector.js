@@ -30,16 +30,19 @@ const focusSectorSchema = new mongoose.Schema(
   {
     slug: { type: String, required: true, unique: true, lowercase: true, trim: true },
     name: { type: bilingualSchema, default: () => ({}) },
+    icon: { type: String, default: "" },
     image: { type: String, default: "" },
     description: { type: bilingualSchema, default: () => ({}) },
     statBoxes: { type: [statBoxSchema], default: [] },
     yearlyChart: { type: [yearlyChartSchema], default: [] },
     topMarkets: { type: [topMarketSchema], default: [] },
     keyInsights: { type: bilingualSchema, default: () => ({}) },
+    order: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
 
 apiJson(focusSectorSchema, { idFrom: "slug" });
+focusSectorSchema.index({ order: 1 });
 
 module.exports = mongoose.model("FocusSector", focusSectorSchema);

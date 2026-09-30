@@ -37,6 +37,7 @@ const focusSectors = makeCrud(FocusSector, {
   label: "Focus sector",
   slugField: "slug",
   slugFrom: "name.en",
+  sort: { order: 1 },
   fileFields: { image: "focus-sectors" },
 });
 

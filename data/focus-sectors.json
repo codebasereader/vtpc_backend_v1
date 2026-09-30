@@ -1,6 +1,8 @@
 [
   {
     "slug": "pharmaceutical-biotech",
+    "order": 0,
+    "icon": "pill",
     "name": {
       "en": "Pharmaceutical & Biotech",
       "kn": ""
@@ -80,6 +82,8 @@
   },
   {
     "slug": "electrical-machinery-equipment",
+    "order": 1,
+    "icon": "zap",
     "name": {
       "en": "Electrical Machinery & Equipment",
       "kn": ""
@@ -159,6 +163,8 @@
   },
   {
     "slug": "ready-made-garments",
+    "order": 2,
+    "icon": "shirt",
     "name": {
       "en": "Ready-made garments",
       "kn": ""
@@ -245,6 +251,8 @@
   },
   {
     "slug": "automobile",
+    "order": 3,
+    "icon": "car",
     "name": {
       "en": "Automobile",
       "kn": ""
@@ -324,6 +332,8 @@
   },
   {
     "slug": "organic-chemicals",
+    "order": 4,
+    "icon": "flask",
     "name": {
       "en": "Organic Chemicals",
       "kn": ""
@@ -381,6 +391,8 @@
   },
   {
     "slug": "aerospace",
+    "order": 5,
+    "icon": "rocket",
     "name": {
       "en": "Aerospace",
       "kn": ""
@@ -460,6 +472,8 @@
   },
   {
     "slug": "optical-and-medical",
+    "order": 6,
+    "icon": "eye",
     "name": {
       "en": "Optical and Medical",
       "kn": ""
@@ -517,6 +531,8 @@
   },
   {
     "slug": "food-products",
+    "order": 7,
+    "icon": "wheat",
     "name": {
       "en": "Food Products",
       "kn": ""
