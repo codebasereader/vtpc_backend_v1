@@ -16,6 +16,7 @@ const DownloadCategory = require("./DownloadCategory");
 const HomepageContent = require("./HomepageContent");
 const NewsletterSubscriber = require("./NewsletterSubscriber");
 const NewsletterIssue = require("./NewsletterIssue");
+const ContactEnquiry = require("./ContactEnquiry");
 const AdminUser = require("./AdminUser");
 const SiteVisit = require("./SiteVisit");
 const StateExport = require("./StateExport");
@@ -41,6 +42,7 @@ module.exports = {
   HomepageContent,
   NewsletterSubscriber,
   NewsletterIssue,
+  ContactEnquiry,
   AdminUser,
   SiteVisit,
   StateExport,

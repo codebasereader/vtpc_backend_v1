@@ -62,6 +62,7 @@ module.exports = {
     pass: process.env.SMTP_PASS || "",
     from: process.env.SMTP_FROM || process.env.ADMIN_EMAIL || "noreply@vtpc.gov.in",
   },
+  contactNotifyEmail: process.env.CONTACT_NOTIFY_EMAIL || "",
   media: {
     imageMaxWidth: Number(process.env.IMAGE_MAX_WIDTH) || 1920,
     imageWebpQuality: Number(process.env.IMAGE_WEBP_QUALITY) || 82,

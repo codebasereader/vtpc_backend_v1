@@ -2,6 +2,7 @@ const express = require("express");
 const page = require("../controllers/pageController");
 const homepage = require("../controllers/homepageController");
 const enquiry = require("../controllers/enquiryController");
+const contactEnquiry = require("../controllers/contactEnquiryController");
 const newsletter = require("../controllers/newsletterController");
 const visits = require("../controllers/visitController");
 const lastUpdated = require("../controllers/lastUpdatedController");
@@ -53,6 +54,7 @@ router.get("/last-updated", lastUpdated.lastUpdated);
 router.get("/visits/summary", visits.summary);
 
 router.post("/enquiries", publicWriteLimiter, enquiry.create);
+router.post("/contact-enquiries", publicWriteLimiter, contactEnquiry.create);
 router.post("/newsletter/subscribe", publicWriteLimiter, newsletter.subscribe);
 router.post("/visits/track", visitTrackLimiter, visits.track);
 

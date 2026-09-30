@@ -2,6 +2,7 @@ const express = require("express");
 const page = require("../controllers/pageController");
 const homepage = require("../controllers/homepageController");
 const enquiry = require("../controllers/enquiryController");
+const contactEnquiry = require("../controllers/contactEnquiryController");
 const newsletter = require("../controllers/newsletterController");
 const newsletterIssues = require("../controllers/newsletterIssueController");
 const visits = require("../controllers/visitController");
@@ -87,6 +88,9 @@ router.delete("/gi-products/:id", giProducts.remove);
 
 router.get("/enquiries", enquiry.list);
 router.patch("/enquiries/:id", enquiry.updateContacted);
+
+router.get("/contact-enquiries", contactEnquiry.list);
+router.patch("/contact-enquiries/:id", contactEnquiry.updateContacted);
 
 router.post("/offices", offices.create);
 router.put("/offices/:id", offices.update);
