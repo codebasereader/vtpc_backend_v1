@@ -5,6 +5,12 @@ const { asyncHandler } = require("../utils/errors");
 const { findByParamOrThrow } = require("../utils/lookup");
 const { applyUploadedFiles, deleteLocal } = require("../utils/upload");
 const { scheduleVideoJobs } = require("../utils/optimizeVideo");
+const env = require("../config/env");
+
+function mediaPath(value) {
+  if (!value || typeof value !== "string") return "";
+  return value.replace(env.publicBaseUrl, "");
+}
 
 function getPath(obj, path) {
   return path.split(".").reduce((acc, key) => (acc == null ? acc : acc[key]), obj);
@@ -75,6 +81,7 @@ function makeCrud(Model, options = {}) {
 
     update: asyncHandler(async (req, res) => {
       const doc = await findByParamOrThrow(Model, req.params.id, slugField, label);
+      const previousVideo = doc.video;
       const body = incoming(req, { generateSlug: false });
       for (const key of fileKeys) {
         if (body[key] && body[key] !== doc[key]) {
@@ -83,8 +90,13 @@ function makeCrud(Model, options = {}) {
       }
       Object.assign(doc, body);
       await doc.save();
-      scheduleVideoJobs(Model, doc);
-      if (doc.isModified()) await doc.save();
+      const uploadedNewVideo = Boolean(
+        body.video && mediaPath(body.video) !== mediaPath(previousVideo)
+      );
+      if (uploadedNewVideo) {
+        scheduleVideoJobs(Model, doc);
+        if (doc.isModified()) await doc.save();
+      }
       sendJson(res, doc.toJSON());
     }),
 

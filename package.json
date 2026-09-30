@@ -10,6 +10,7 @@
     "seed:market": "node src/scripts/importMarketIntelligence.js",
     "create-admin": "node src/scripts/createAdmin.js",
     "optimize:media": "node src/scripts/optimizeExistingMedia.js",
+    "backfill:focus-sectors": "node src/scripts/backfillFocusSectors.js",
     "migrate:leader-names": "node src/scripts/migrateLeaderNames.js"
   },
   "engines": {

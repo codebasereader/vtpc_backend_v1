@@ -9,7 +9,16 @@ cp .env.example .env
 # set MONGODB_URI, SESSION_SECRET, CORS_ORIGINS, ADMIN_* 
 
 npm install
-npm run seed          # admin user + starter content
+# ffmpeg is required for video conversion (optional but recommended):
+#   macOS:  brew install ffmpeg
+#   Ubuntu: sudo apt-get install -y ffmpeg
+#   Windows: winget install ffmpeg
+# If the Node process still cannot find it, set FFMPEG_PATH in .env.
+
+npm run seed          # first-time only: admin user + starter content
+# Do NOT run `npm run seed` on a database with real CMS edits — it replaces
+# Pages, Leaders, Districts, Cities and Focus Sectors.
+# Safe one-shot: npm run backfill:focus-sectors   # only $set order + icon
 npm run dev           # http://localhost:4200  (PORT / PUBLIC_BASE_URL must match)
 ```
 
@@ -39,9 +48,9 @@ Returned URLs are public. The citizen site loads them directly; no auth.
 
 JPEG/PNG uploads are converted to WebP (max 1920px wide, quality 82) before the path is saved. GIFs and files that are already WebP are left as-is. PDFs and Office documents in `downloads/` are never converted.
 
-Videos (including iPhone `.mov`) are saved immediately, then converted in the background to H.264/AAC MP4 (max 1280px wide). The document's `video` URL is swapped when conversion finishes. GI products also expose `videoStatus`: `"processing"` | `"ready"` | `"failed"`. Requires **ffmpeg** on the server.
+Videos (including iPhone `.mov`) are saved immediately, then converted in the background to H.264/AAC MP4 (max 1280px wide). The document's `video` URL is swapped when conversion finishes. Conversion is queued **only when a new video file is uploaded**, not on every save of the same record. GI products also expose `videoStatus`: `"processing"` | `"ready"` | `"failed"`. Requires **ffmpeg** on the server PATH (restart the backend after installing it). If ffmpeg is missing, the original file is kept and `videoStatus` becomes `"failed"`.
 
-Existing files (except GI images already converted) can be batch-optimised with `npm run optimize:media`.
+Existing files (except GI images already converted) can be batch-optimised with `npm run optimize:media` once ffmpeg is installed.
 
 Drop seed media into `uploads/` using the names in `uploads/README.txt`.
 
@@ -74,7 +83,7 @@ If the Karnataka SVG uses different ids, change the `slug` (the API `id`) to mat
 ## EC2
 
 1. Install Node 20, nginx, **ffmpeg**, and either local MongoDB or use Atlas (`MONGODB_URI`).
-   On Ubuntu: `sudo apt-get install -y ffmpeg`
+   On Ubuntu: `sudo apt-get install -y ffmpeg`. Restart the Node/PM2 process after installing so it is on PATH. Optional: set `FFMPEG_PATH` in `.env` if the binary is not on PATH.
 2. Clone this repo, `cp .env.example .env`, edit:
    - `NODE_ENV=production`
    - `PUBLIC_BASE_URL=https://your-api-host`

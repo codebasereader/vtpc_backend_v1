@@ -8,15 +8,36 @@ const inflight = new Set();
 const queue = [];
 let running = false;
 let ffmpegMissingLogged = false;
+let ffmpegBinCache;
 
 function publicPathFromAbs(absPath) {
   const rel = path.relative(env.uploadsDir, absPath).split(path.sep).join("/");
   return `/uploads/${rel}`;
 }
 
+function resolveFfmpegBin() {
+  if (ffmpegBinCache !== undefined) return ffmpegBinCache;
+  const fromEnv = env.media.ffmpegPath;
+  const candidates = [
+    fromEnv,
+    "/opt/homebrew/bin/ffmpeg",
+    "/usr/local/bin/ffmpeg",
+    "/usr/bin/ffmpeg",
+    "/opt/local/bin/ffmpeg",
+  ].filter(Boolean);
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) {
+      ffmpegBinCache = candidate;
+      return ffmpegBinCache;
+    }
+  }
+  ffmpegBinCache = "ffmpeg";
+  return ffmpegBinCache;
+}
+
 function runFfmpeg(args) {
   return new Promise((resolve, reject) => {
-    const proc = spawn("ffmpeg", args, { stdio: ["ignore", "ignore", "pipe"] });
+    const proc = spawn(resolveFfmpegBin(), args, { stdio: ["ignore", "ignore", "pipe"] });
     let stderr = "";
     proc.stderr.on("data", (chunk) => {
       stderr += chunk;

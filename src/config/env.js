@@ -69,6 +69,7 @@ module.exports = {
     videoMaxWidth: Number(process.env.VIDEO_MAX_WIDTH) || 1280,
     videoCrf: Number(process.env.VIDEO_CRF) || 23,
     videoSkipMp4MaxBytes: 15 * 1024 * 1024,
+    ffmpegPath: process.env.FFMPEG_PATH || "",
   },
   uploadsDir: path.resolve(__dirname, "../../uploads"),
 };
