@@ -2,6 +2,7 @@ const { HomepageContent } = require("../models");
 const { asyncHandler } = require("../utils/errors");
 const { parseRequestBody } = require("../utils/parseBody");
 const { sendJson } = require("../utils/serialize");
+const { record, clonePlain, diffObjects, targetFrom } = require("../utils/audit");
 
 const EMPTY = {
   hero: { title: "", subtitle: "" },
@@ -37,12 +38,20 @@ const get = asyncHandler(async (req, res) => {
 const update = asyncHandler(async (req, res) => {
   const body = parseRequestBody(req.body || {});
   const doc = await getOrCreate();
+  const before = clonePlain(doc);
   doc.hero = {
     title: body.hero?.title || "",
     subtitle: body.hero?.subtitle || "",
   };
   doc.highlights = Array.isArray(body.highlights) ? body.highlights : [];
   await doc.save();
+  record(req, {
+    action: "update",
+    resource: "homepageContent",
+    target: targetFrom(doc),
+    summary: "Updated homepage content",
+    changes: diffObjects(before, clonePlain(doc)),
+  });
   sendJson(res, toPublic(doc));
 });
 

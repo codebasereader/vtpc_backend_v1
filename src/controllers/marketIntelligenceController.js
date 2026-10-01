@@ -13,18 +13,25 @@ function listHandler(Model, sort) {
   });
 }
 
-function bulkReplaceHandler(Model, label) {
+function bulkReplaceHandler(Model, label, resource) {
   return asyncHandler(async (req, res) => {
     const count = await replaceCollection(Model, req.body, { label });
+    const { record } = require("../utils/audit");
+    record(req, {
+      action: "update",
+      resource,
+      target: { id: null, label },
+      summary: `Replaced ${label.toLowerCase()} (${count} row(s))`,
+    });
     res.status(200).json({ message: `${label} replaced`, count });
   });
 }
 
 module.exports = {
   listStateExports: listHandler(StateExport, { name: 1 }),
-  replaceStateExports: bulkReplaceHandler(StateExport, "State exports"),
+  replaceStateExports: bulkReplaceHandler(StateExport, "State exports", "marketIntelligence"),
   listTopProducts: listHandler(TopProduct, { productName: 1 }),
-  replaceTopProducts: bulkReplaceHandler(TopProduct, "Top products"),
+  replaceTopProducts: bulkReplaceHandler(TopProduct, "Top products", "marketIntelligence"),
   listCountryProducts: listHandler(CountryProduct, { country: 1, value: -1 }),
-  replaceCountryProducts: bulkReplaceHandler(CountryProduct, "Country products"),
+  replaceCountryProducts: bulkReplaceHandler(CountryProduct, "Country products", "marketIntelligence"),
 };

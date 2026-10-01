@@ -18,8 +18,10 @@ const {
 } = require("../models");
 const data = require("./data");
 const { importMarketIntelligence } = require("./marketIntelligence");
+const { migrateRoles } = require("../scripts/migrateRoles");
 
 async function upsertAdmin() {
+  const { superAdmin } = await migrateRoles();
   const email = env.admin.email.toLowerCase();
   const existing = await AdminUser.findOne({ email });
   if (existing) {
@@ -30,10 +32,12 @@ async function upsertAdmin() {
   await AdminUser.create({
     email,
     name: env.admin.name,
-    role: "editor",
+    role: superAdmin._id,
     passwordHash,
+    isActive: true,
+    mustChangePassword: false,
   });
-  console.log(`Created admin ${email}`);
+  console.log(`Created Super Admin ${email}`);
 }
 
 function uniqueValue(row, uniqueKey) {

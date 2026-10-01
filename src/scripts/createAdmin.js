@@ -1,9 +1,11 @@
 const env = require("../config/env");
 const { connectDb } = require("../config/db");
 const { AdminUser } = require("../models");
+const { migrateRoles } = require("./migrateRoles");
 
 async function main() {
   await connectDb();
+  const { superAdmin } = await migrateRoles();
   const email = env.admin.email.toLowerCase();
   const passwordHash = await AdminUser.hashPassword(env.admin.password);
   const existing = await AdminUser.findOne({ email });
@@ -17,10 +19,12 @@ async function main() {
     await AdminUser.create({
       email,
       name: env.admin.name,
-      role: "editor",
+      role: superAdmin._id,
       passwordHash,
+      isActive: true,
+      mustChangePassword: false,
     });
-    console.log(`Created admin ${email}`);
+    console.log(`Created Super Admin ${email}`);
   }
 
   process.exit(0);

@@ -19,7 +19,10 @@ const NewsletterIssue = require("./NewsletterIssue");
 const Form = require("./Form");
 const FormResponse = require("./FormResponse");
 const ContactEnquiry = require("./ContactEnquiry");
+const Role = require("./Role");
 const AdminUser = require("./AdminUser");
+const AuditLog = require("./AuditLog");
+const AuditSession = require("./AuditSession");
 const SiteVisit = require("./SiteVisit");
 const StateExport = require("./StateExport");
 const TopProduct = require("./TopProduct");
@@ -47,7 +50,10 @@ module.exports = {
   Form,
   FormResponse,
   ContactEnquiry,
+  Role,
   AdminUser,
+  AuditLog,
+  AuditSession,
   SiteVisit,
   StateExport,
   TopProduct,

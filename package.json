@@ -11,7 +11,8 @@
     "create-admin": "node src/scripts/createAdmin.js",
     "optimize:media": "node src/scripts/optimizeExistingMedia.js",
     "backfill:focus-sectors": "node src/scripts/backfillFocusSectors.js",
-    "migrate:leader-names": "node src/scripts/migrateLeaderNames.js"
+    "migrate:leader-names": "node src/scripts/migrateLeaderNames.js",
+    "migrate:roles": "node src/scripts/migrateRoles.js"
   },
   "engines": {
     "node": ">=18"

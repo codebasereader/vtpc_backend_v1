@@ -1,7 +1,8 @@
 class HttpError extends Error {
-  constructor(status, message) {
+  constructor(status, message, code) {
     super(message);
     this.status = status;
+    this.code = code;
   }
 }
 
@@ -19,7 +20,9 @@ function errorHandler(err, req, res, next) {
   }
 
   if (err instanceof HttpError) {
-    return res.status(err.status).json({ message: err.message });
+    const body = { message: err.message };
+    if (err.code) body.code = err.code;
+    return res.status(err.status).json(body);
   }
 
   if (err.name === "ValidationError") {

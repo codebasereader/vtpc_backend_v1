@@ -5,6 +5,7 @@ const { asyncHandler } = require("../utils/errors");
 const { findByParamOrThrow } = require("../utils/lookup");
 const { applyUploadedFiles, deleteLocal } = require("../utils/upload");
 const { scheduleVideoJobs } = require("../utils/optimizeVideo");
+const { record, clonePlain, diffObjects, createChanges, deleteChanges, targetFrom } = require("../utils/audit");
 const env = require("../config/env");
 
 function mediaPath(value) {
@@ -44,9 +45,15 @@ function makeCrud(Model, options = {}) {
     sort = null,
     label = "Record",
     fileFields = {},
+    resource = null,
+    resourceFrom = null,
   } = options;
 
   const fileKeys = Object.keys(fileFields);
+
+  function resolveResource(doc) {
+    return resourceFrom ? resourceFrom(doc) : resource;
+  }
 
   function incoming(req, { generateSlug = true } = {}) {
     const body = parseRequestBody(req.body || {});
@@ -76,11 +83,19 @@ function makeCrud(Model, options = {}) {
       const doc = await Model.create(body);
       scheduleVideoJobs(Model, doc);
       if (doc.isModified()) await doc.save();
+      record(req, {
+        action: "create",
+        resource: resolveResource(doc),
+        target: targetFrom(doc),
+        summary: `Created ${label.toLowerCase()} “${targetFrom(doc).label}”`,
+        changes: createChanges(doc),
+      });
       sendJson(res, doc.toJSON(), 201);
     }),
 
     update: asyncHandler(async (req, res) => {
       const doc = await findByParamOrThrow(Model, req.params.id, slugField, label);
+      const before = clonePlain(doc);
       const previousVideo = doc.video;
       const body = incoming(req, { generateSlug: false });
       for (const key of fileKeys) {
@@ -97,15 +112,31 @@ function makeCrud(Model, options = {}) {
         scheduleVideoJobs(Model, doc);
         if (doc.isModified()) await doc.save();
       }
+      record(req, {
+        action: "update",
+        resource: resolveResource(doc),
+        target: targetFrom(doc),
+        summary: `Updated ${label.toLowerCase()} “${targetFrom(doc).label}”`,
+        changes: diffObjects(before, clonePlain(doc)),
+      });
       sendJson(res, doc.toJSON());
     }),
 
     remove: asyncHandler(async (req, res) => {
       const doc = await findByParamOrThrow(Model, req.params.id, slugField, label);
+      const target = targetFrom(doc);
+      const snapshot = deleteChanges(doc);
       for (const key of fileKeys) {
         if (doc[key]) deleteLocal(doc[key]);
       }
       await doc.deleteOne();
+      record(req, {
+        action: "delete",
+        resource: resolveResource(doc),
+        target,
+        summary: `Deleted ${label.toLowerCase()} “${target.label}”`,
+        changes: snapshot,
+      });
       res.status(200).json({ message: `${label} deleted` });
     }),
   };

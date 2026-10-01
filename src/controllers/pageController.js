@@ -3,7 +3,7 @@ const { makeCrud } = require("./crud");
 const { asyncHandler, HttpError } = require("../utils/errors");
 const { sendJson } = require("../utils/serialize");
 
-const admin = makeCrud(Page, { label: "Page", slugField: "slug", slugFrom: "title.en" });
+const admin = makeCrud(Page, { label: "Page", resource: "pages", slugField: "slug", slugFrom: "title.en" });
 
 const getBySlug = asyncHandler(async (req, res) => {
   const slug = String(req.params.slug || "").toLowerCase();

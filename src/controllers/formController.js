@@ -7,6 +7,7 @@ const {
   isDuplicateSubmission,
   clientIp,
 } = require("../utils/forms");
+const { record, clonePlain, diffObjects, deleteChanges, targetFrom } = require("../utils/audit");
 
 function toSummary(form, responseCount = 0) {
   const json = form.toJSON();
@@ -96,17 +97,31 @@ const create = asyncHandler(async (req, res) => {
     throw new HttpError(409, "slug already exists");
   }
   const form = await Form.create(payload);
+  record(req, {
+    action: "create",
+    resource: "forms",
+    target: targetFrom(form),
+    summary: `Created form “${form.title?.en || form.slug}”`,
+  });
   res.status(201).json(form.toJSON());
 });
 
 const replace = asyncHandler(async (req, res) => {
   const form = await findByParamOrThrow(Form, req.params.id, "slug", "Form");
+  const before = clonePlain(form);
   const payload = parseFormPayload(req.body, { includeSlug: false });
   form.title = payload.title;
   form.description = payload.description;
   form.isActive = payload.isActive;
   form.questions = payload.questions;
   await form.save();
+  record(req, {
+    action: "update",
+    resource: "forms",
+    target: targetFrom(form),
+    summary: `Updated form “${form.title?.en || form.slug}”`,
+    changes: diffObjects(before, clonePlain(form)),
+  });
   res.json(form.toJSON());
 });
 
@@ -115,16 +130,33 @@ const patchActive = asyncHandler(async (req, res) => {
     throw new HttpError(400, "isActive must be true or false");
   }
   const form = await findByParamOrThrow(Form, req.params.id, "slug", "Form");
+  const wasActive = form.isActive;
   form.isActive = req.body.isActive;
   await form.save();
+  record(req, {
+    action: "status_change",
+    resource: "forms",
+    target: targetFrom(form),
+    summary: `${form.isActive ? "Activated" : "Deactivated"} form “${form.title?.en || form.slug}”`,
+    changes: [{ field: "isActive", from: wasActive, to: form.isActive }],
+  });
   const responseCount = await FormResponse.countDocuments({ form: form._id });
   res.json(toSummary(form, responseCount));
 });
 
 const remove = asyncHandler(async (req, res) => {
   const form = await findByParamOrThrow(Form, req.params.id, "slug", "Form");
+  const target = targetFrom(form);
+  const snapshot = deleteChanges(form);
   await FormResponse.deleteMany({ form: form._id });
   await form.deleteOne();
+  record(req, {
+    action: "delete",
+    resource: "forms",
+    target,
+    summary: `Deleted form “${target.label}”`,
+    changes: snapshot,
+  });
   res.json({ message: "Form deleted" });
 });
 
@@ -141,6 +173,12 @@ const removeResponse = asyncHandler(async (req, res) => {
     throw new HttpError(404, "Response not found");
   }
   await row.deleteOne();
+  record(req, {
+    action: "delete",
+    resource: "forms",
+    target: { id: String(row._id), label: `Response on ${form.title?.en || form.slug}` },
+    summary: `Deleted a response on “${form.title?.en || form.slug}”`,
+  });
   res.json({ message: "Response deleted" });
 });
 

@@ -8,6 +8,9 @@ const newsletter = require("../controllers/newsletterController");
 const newsletterIssues = require("../controllers/newsletterIssueController");
 const visits = require("../controllers/visitController");
 const uploadCtrl = require("../controllers/uploadController");
+const roles = require("../controllers/roleController");
+const users = require("../controllers/userController");
+const audit = require("../controllers/auditController");
 const {
   leaders,
   districts,
@@ -24,7 +27,16 @@ const {
   downloads,
 } = require("../controllers/resourcesController");
 const market = require("../controllers/marketIntelligenceController");
-const { requireAuth } = require("../middleware/auth");
+const {
+  requireAuth,
+  requirePasswordChanged,
+  requirePermission,
+  requireAnyPermission,
+  requireAnyCatalogPermission,
+  requireSuperAdmin,
+  requireStaffAccess,
+} = require("../middleware/auth");
+const { ROUTE_PERMISSIONS } = require("../config/permissions");
 const {
   upload,
   setUploadFolders,
@@ -35,8 +47,20 @@ const {
 const router = express.Router();
 
 router.use(requireAuth);
+router.use(requirePasswordChanged);
 
-router.post("/uploads", uploadCtrl.fromQueryFolder, upload.single("file"), optimizeUploadedImages, uploadCtrl.create);
+for (const [prefix, key] of ROUTE_PERMISSIONS) {
+  router.use(prefix, requirePermission(key));
+}
+
+router.post(
+  "/uploads",
+  requireAnyCatalogPermission,
+  uploadCtrl.fromQueryFolder,
+  upload.single("file"),
+  optimizeUploadedImages,
+  uploadCtrl.create
+);
 
 router.get("/pages", page.list);
 router.post("/pages", page.create);
@@ -106,9 +130,9 @@ router.post("/offices", offices.create);
 router.put("/offices/:id", offices.update);
 router.delete("/offices/:id", offices.remove);
 
-router.post("/staff", setUploadFolders({ photo: "staff", file: "staff" }), upload.any(), optimizeUploadedImages, staff.create);
-router.put("/staff/:id", setUploadFolders({ photo: "staff", file: "staff" }), upload.any(), optimizeUploadedImages, staff.update);
-router.delete("/staff/:id", staff.remove);
+router.post("/staff", requireStaffAccess, setUploadFolders({ photo: "staff", file: "staff" }), upload.any(), optimizeUploadedImages, staff.create);
+router.put("/staff/:id", requireStaffAccess, setUploadFolders({ photo: "staff", file: "staff" }), upload.any(), optimizeUploadedImages, staff.update);
+router.delete("/staff/:id", requireStaffAccess, staff.remove);
 
 router.post("/events", events.create);
 router.put("/events/:id", events.update);
@@ -130,24 +154,50 @@ router.post("/downloads", setUploadFolders({ file: "downloads", fileUrl: "downlo
 router.put("/downloads/:id", setUploadFolders({ file: "downloads", fileUrl: "downloads" }), upload.any(), optimizeUploadedImages, downloads.update);
 router.delete("/downloads/:id", downloads.remove);
 
-router.put("/homepage-content", homepage.update);
-
 router.get("/newsletter/subscribers", newsletter.list);
 router.get("/newsletter/subscribers/export", newsletter.exportCsv);
 router.patch("/newsletter/subscribers/:id", newsletter.updateStatus);
-router.get("/newsletter/issues", newsletterIssues.list);
+router.get(
+  "/newsletter/issues",
+  requireAnyPermission("newsletterIssues", "newslettersSent"),
+  newsletterIssues.list
+);
 router.post(
   "/newsletter/issues",
+  requirePermission("newsletterIssues"),
   setUploadFolders({ attachment: "newsletters" }),
   upload.any(),
   assertNewsletterPdf,
   newsletterIssues.create
 );
-router.post("/newsletter/issues/:id/send", newsletterIssues.send);
-router.delete("/newsletter/issues/:id", newsletterIssues.remove);
+router.post("/newsletter/issues/:id/send", requirePermission("newsletterIssues"), newsletterIssues.send);
+router.delete("/newsletter/issues/:id", requirePermission("newsletterIssues"), newsletterIssues.remove);
 
 router.get("/visits/daily", visits.daily);
 
+router.use(requireSuperAdmin);
+
+router.get("/permissions", roles.listPermissions);
+router.get("/roles", roles.list);
+router.post("/roles", roles.create);
+router.put("/roles/:id/permissions", roles.updatePermissions);
+router.put("/roles/:id", roles.update);
+router.delete("/roles/:id", roles.remove);
+
+router.get("/users", users.list);
+router.post("/users", users.create);
+router.put("/users/:id", users.update);
+router.patch("/users/:id", users.patchActive);
+router.post("/users/:id/reset-password", users.resetPassword);
+router.delete("/users/:id", users.remove);
+
+router.get("/audit/logs/export", audit.exportLogs);
+router.get("/audit/logs/:id", audit.getLog);
+router.get("/audit/logs", audit.listLogs);
+router.get("/audit/sessions/:id", audit.getSession);
+router.get("/audit/sessions", audit.listSessions);
+
+router.put("/homepage-content", homepage.update);
 router.post("/state-exports/bulk-replace", market.replaceStateExports);
 router.post("/top-products/bulk-replace", market.replaceTopProducts);
 router.post("/country-products/bulk-replace", market.replaceCountryProducts);

@@ -3,6 +3,7 @@ const env = require("../config/env");
 const { asyncHandler, HttpError } = require("../utils/errors");
 const { findByParamOrThrow } = require("../utils/lookup");
 const { mailConfigured, sendHtmlMail } = require("../utils/mailer");
+const { record } = require("../utils/audit");
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_RE = /^[0-9+\s()-]{7,20}$/;
@@ -115,6 +116,13 @@ const updateContacted = asyncHandler(async (req, res) => {
     row.contactedBy = "";
   }
   await row.save();
+  record(req, {
+    action: "status_change",
+    resource: "contactEnquiries",
+    target: { id: String(row._id), label: row.email },
+    summary: `${row.contacted ? "Marked" : "Unmarked"} contact enquiry from ${row.email} as contacted`,
+    changes: [{ field: "contacted", from: !row.contacted, to: row.contacted }],
+  });
   res.json(toContactEnquiryJson(row));
 });
 

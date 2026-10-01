@@ -1,6 +1,7 @@
 const { NewsletterSubscriber } = require("../models");
 const { asyncHandler, HttpError } = require("../utils/errors");
 const { findByParamOrThrow } = require("../utils/lookup");
+const { record } = require("../utils/audit");
 
 function csvEscape(value) {
   const s = String(value ?? "");
@@ -47,9 +48,17 @@ const updateStatus = asyncHandler(async (req, res) => {
     throw new HttpError(400, "status must be active or blocked");
   }
   const row = await findByParamOrThrow(NewsletterSubscriber, req.params.id, null, "Subscriber");
+  const previous = row.status === "blocked" ? "blocked" : "active";
   row.status = status;
   row.blockedAt = status === "blocked" ? new Date() : null;
   await row.save();
+  record(req, {
+    action: "status_change",
+    resource: "newsletterSubscribers",
+    target: { id: String(row._id), label: row.email },
+    summary: `${status === "blocked" ? "Blocked" : "Unblocked"} subscriber ${row.email}`,
+    changes: [{ field: "status", from: previous, to: status }],
+  });
   res.json(toSubscriberJson(row));
 });
 

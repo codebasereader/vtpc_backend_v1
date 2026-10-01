@@ -6,8 +6,11 @@ const adminUserSchema = new mongoose.Schema(
   {
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     name: { type: String, required: true, trim: true },
-    role: { type: String, enum: ["editor", "admin"], default: "editor" },
+    role: { type: mongoose.Schema.Types.ObjectId, ref: "Role", required: true },
     passwordHash: { type: String, required: true },
+    isActive: { type: Boolean, default: true },
+    mustChangePassword: { type: Boolean, default: false },
+    lastLoginAt: { type: Date, default: null },
   },
   { timestamps: true }
 );
@@ -20,10 +23,6 @@ adminUserSchema.statics.hashPassword = function hashPassword(password) {
   return bcrypt.hash(password, 12);
 };
 
-adminUserSchema.methods.publicProfile = function publicProfile() {
-  return { id: String(this._id), name: this.name, role: this.role };
-};
-
-apiJson(adminUserSchema);
+apiJson(adminUserSchema, { keepTimestamps: true });
 
 module.exports = mongoose.model("AdminUser", adminUserSchema);

@@ -5,6 +5,7 @@ const { sendJson } = require("../utils/serialize");
 const { findByParamOrThrow } = require("../utils/lookup");
 const { parseRequestBody } = require("../utils/parseBody");
 const { mailConfigured, sendHtmlMailBatch } = require("../utils/mailer");
+const { record, deleteChanges, targetFrom } = require("../utils/audit");
 const {
   applyUploadedFiles,
   collectFiles,
@@ -125,6 +126,12 @@ const create = asyncHandler(async (req, res) => {
     if (body.attachment) deleteLocal(body.attachment);
     throw err;
   }
+  record(req, {
+    action: "create",
+    resource: "newsletterIssues",
+    target: targetFrom(doc),
+    summary: `Created newsletter “${doc.subject}”`,
+  });
   sendJson(res, doc.toJSON(), 201);
 });
 
@@ -155,11 +162,23 @@ const send = asyncHandler(async (req, res) => {
       throw err;
     }
     const sent = await NewsletterIssue.findById(issue._id);
+    record(req, {
+      action: "send",
+      resource: "newsletterIssues",
+      target: targetFrom(sent),
+      summary: `Sent newsletter “${sent.subject}” to ${sent.recipientCount || 0} recipient(s)`,
+    });
     sendJson(res, sent.toJSON());
     return;
   }
 
   scheduleIssueSend(issue._id);
+  record(req, {
+    action: "send",
+    resource: "newsletterIssues",
+    target: targetFrom(issue),
+    summary: `Queued newsletter “${issue.subject}” for ${subscriberCount} recipient(s)`,
+  });
   sendJson(res, issue.toJSON());
 });
 
@@ -172,7 +191,16 @@ const remove = asyncHandler(async (req, res) => {
     throw new HttpError(409, "This issue is currently sending and cannot be deleted");
   }
   if (issue.attachment) deleteLocal(issue.attachment);
+  const target = targetFrom(issue);
+  const snapshot = deleteChanges(issue);
   await issue.deleteOne();
+  record(req, {
+    action: "delete",
+    resource: "newsletterIssues",
+    target,
+    summary: `Deleted newsletter “${target.label}”`,
+    changes: snapshot,
+  });
   res.json({ message: "Newsletter issue deleted" });
 });
 

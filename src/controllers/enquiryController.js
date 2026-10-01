@@ -1,6 +1,7 @@
 const { Enquiry, GIProduct } = require("../models");
 const { asyncHandler, HttpError } = require("../utils/errors");
 const { findByParamOrThrow } = require("../utils/lookup");
+const { record } = require("../utils/audit");
 
 function contactedByLabel(user) {
   if (!user) return "";
@@ -64,6 +65,13 @@ const updateContacted = asyncHandler(async (req, res) => {
     row.contactedBy = "";
   }
   await row.save();
+  record(req, {
+    action: "status_change",
+    resource: "giEnquiries",
+    target: { id: String(row._id), label: row.email },
+    summary: `${row.contacted ? "Marked" : "Unmarked"} GI enquiry from ${row.email} as contacted`,
+    changes: [{ field: "contacted", from: !row.contacted, to: row.contacted }],
+  });
   res.json(toEnquiryJson(row));
 });
 
