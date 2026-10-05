@@ -27,6 +27,7 @@ const {
   downloads,
 } = require("../controllers/resourcesController");
 const market = require("../controllers/marketIntelligenceController");
+const marketReleases = require("../controllers/marketReleaseController");
 const {
   requireAuth,
   requirePasswordChanged,
@@ -174,6 +175,9 @@ router.post("/newsletter/issues/:id/send", requirePermission("newsletterIssues")
 router.delete("/newsletter/issues/:id", requirePermission("newsletterIssues"), newsletterIssues.remove);
 
 router.get("/visits/daily", visits.daily);
+
+router.put("/market-releases/:key", marketReleases.upsert);
+router.delete("/market-releases/:key", marketReleases.remove);
 
 router.use(requireSuperAdmin);
 

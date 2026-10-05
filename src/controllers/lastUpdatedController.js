@@ -10,6 +10,7 @@ const {
   StaffMember,
   Leader,
   DownloadCategory,
+  MarketRelease,
 } = require("../models");
 const { asyncHandler } = require("../utils/errors");
 
@@ -25,6 +26,7 @@ const MODELS = [
   StaffMember,
   Leader,
   DownloadCategory,
+  MarketRelease,
 ];
 
 const lastUpdated = asyncHandler(async (req, res) => {

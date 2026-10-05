@@ -17,6 +17,7 @@ const HomepageContent = require("./HomepageContent");
 const NewsletterSubscriber = require("./NewsletterSubscriber");
 const NewsletterIssue = require("./NewsletterIssue");
 const Form = require("./Form");
+const MarketRelease = require("./MarketRelease");
 const FormResponse = require("./FormResponse");
 const ContactEnquiry = require("./ContactEnquiry");
 const Role = require("./Role");
@@ -48,6 +49,7 @@ module.exports = {
   NewsletterSubscriber,
   NewsletterIssue,
   Form,
+  MarketRelease,
   FormResponse,
   ContactEnquiry,
   Role,

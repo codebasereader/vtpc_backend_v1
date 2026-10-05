@@ -27,6 +27,7 @@ const PERMISSION_GROUPS = [
       { key: "taluks", title: "Taluks" },
       { key: "warehouses", title: "Warehouses" },
       { key: "forms", title: "Forms" },
+      { key: "marketData", title: "Market Data" },
     ],
   },
   {
@@ -65,6 +66,7 @@ const ROUTE_PERMISSIONS = [
   ["/taluks", "taluks"],
   ["/warehouses", "warehouses"],
   ["/forms", "forms"],
+  ["/market-releases", "marketData"],
   ["/gi-products", "giProducts"],
   ["/enquiries", "giEnquiries"],
   ["/download-categories", "downloadCategories"],

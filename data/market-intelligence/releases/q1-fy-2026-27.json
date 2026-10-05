@@ -1,0 +1,67 @@
+{
+  "key": "q1-fy-2026-27",
+  "type": "quarter",
+  "label": "Q1 FY 2026-27",
+  "previousLabel": "Q1 FY 2025-26",
+  "unit": "USD Mn",
+  "source": "DGCIS, Kolkata",
+  "totals": { "previous": 9431.443784, "current": 9978.830127 },
+  "districts": [
+    {
+      "name": "Bengaluru Urban",
+      "previous": 2477.235838,
+      "current": 3213.159871,
+      "variation": 29.71,
+      "majorProducts": "Turbo-Jets of A Thrust>25 Kn, other Medicine put up for Retail Sale"
+    },
+    {
+      "name": "Kolar",
+      "previous": 1200.5,
+      "current": 1487.539103,
+      "variation": 23.91,
+      "majorProducts": ""
+    },
+    {
+      "name": "Bengaluru Rural",
+      "previous": 980.12,
+      "current": 1061.02017,
+      "variation": 8.25,
+      "majorProducts": ""
+    }
+  ],
+  "states": ["All India", "Karnataka", "Tamil Nadu", "Telangana"],
+  "stateTotals": {
+    "Karnataka": { "previous": 9431.492081, "current": 9978.845154 },
+    "Telangana": { "previous": null, "current": 3628.082061 }
+  },
+  "sectorStates": [
+    {
+      "sector": "Electronics & Semiconductor",
+      "isServices": false,
+      "values": {
+        "All India": { "previous": 11928.06, "current": 14166.0 },
+        "Karnataka": { "previous": 2631.95, "current": 2846.86 }
+      }
+    },
+    {
+      "sector": "Software & Services Exports",
+      "isServices": true,
+      "values": {
+        "Karnataka": { "previous": 12000, "current": 12800 }
+      }
+    }
+  ],
+  "sectorDistricts": [
+    {
+      "sector": "Electronics & Semiconductor",
+      "isServices": false,
+      "hsCode": "85 -(8501, 8504, 8537,8544)",
+      "total": 2846.86,
+      "values": {
+        "Kolar": 1487.539103,
+        "Bengaluru Rural": 1061.02017
+      }
+    }
+  ],
+  "countryDistricts": []
+}

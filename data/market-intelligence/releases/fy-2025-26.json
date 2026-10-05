@@ -1,0 +1,58 @@
+{
+  "key": "fy-2025-26",
+  "type": "year",
+  "label": "FY 2025-26",
+  "previousLabel": "FY 2024-25",
+  "unit": "USD Mn",
+  "source": "DGCIS, Kolkata",
+  "totals": { "previous": 36000.12, "current": 39800.45 },
+  "districts": [
+    {
+      "name": "Bengaluru Urban",
+      "previous": 9800.1,
+      "current": 11200.4,
+      "variation": 14.29,
+      "majorProducts": "Turbo-Jets, medicines, electronic assemblies"
+    },
+    {
+      "name": "Dakshina Kannada",
+      "previous": 2100.0,
+      "current": 2350.5,
+      "variation": 11.93,
+      "majorProducts": ""
+    }
+  ],
+  "states": ["All India", "Karnataka"],
+  "stateTotals": {
+    "Karnataka": { "previous": 36000.12, "current": 39800.45 }
+  },
+  "sectorStates": [
+    {
+      "sector": "Electronics & Semiconductor",
+      "isServices": false,
+      "values": {
+        "All India": { "previous": 48000, "current": 52000 },
+        "Karnataka": { "previous": 9000, "current": 10200 }
+      }
+    }
+  ],
+  "sectorDistricts": [
+    {
+      "sector": "Electronics & Semiconductor",
+      "isServices": false,
+      "hsCode": "85",
+      "total": 10200,
+      "values": {
+        "Bengaluru Urban": 8200
+      }
+    }
+  ],
+  "countryDistricts": [
+    {
+      "district": "Bengaluru Urban",
+      "country": "United States",
+      "previous": 2700.517044,
+      "current": 3068.648385
+    }
+  ]
+}

@@ -23,6 +23,7 @@ const {
   downloads,
 } = require("../controllers/resourcesController");
 const market = require("../controllers/marketIntelligenceController");
+const marketReleases = require("../controllers/marketReleaseController");
 const downloadFile = require("../controllers/downloadFileController");
 const { publicWriteLimiter, visitTrackLimiter } = require("../middleware/rateLimit");
 
@@ -48,6 +49,8 @@ router.get("/download-categories", downloadCategories.list);
 router.get("/downloads", downloads.list);
 router.get("/downloads/:id/file", downloadFile.sendAttachment);
 router.get("/homepage-content", homepage.get);
+router.get("/market-releases", marketReleases.listPublic);
+router.get("/market-releases/:key", marketReleases.getPublic);
 router.get("/state-exports", market.listStateExports);
 router.get("/top-products", market.listTopProducts);
 router.get("/country-products", market.listCountryProducts);

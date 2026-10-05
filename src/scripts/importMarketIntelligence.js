@@ -6,7 +6,7 @@ async function main() {
   const imported = await importMarketIntelligence();
   if (!imported) {
     console.log(
-      "No market-intelligence JSON files found. Place them in data/market-intelligence/ then re-run."
+      "No market-intelligence JSON files found. Place releases in data/market-intelligence/releases/ then re-run."
     );
   }
   process.exit(0);
