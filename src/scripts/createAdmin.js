@@ -4,6 +4,7 @@ const { AdminUser } = require("../models");
 const { migrateRoles } = require("./migrateRoles");
 
 async function main() {
+  env.assertSafeAdminPassword();
   await connectDb();
   const { superAdmin } = await migrateRoles();
   const email = env.admin.email.toLowerCase();

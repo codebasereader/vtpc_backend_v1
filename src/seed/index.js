@@ -28,6 +28,7 @@ async function upsertAdmin() {
     console.log(`Admin already exists: ${email}`);
     return;
   }
+  env.assertSafeAdminPassword();
   const passwordHash = await AdminUser.hashPassword(env.admin.password);
   await AdminUser.create({
     email,

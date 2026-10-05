@@ -37,19 +37,14 @@ try {
   // invalid URL is handled when a request tries to build a file link
 }
 
-// Refuse to run in production with the example secrets or passwords.
+// Refuse to run in production with the example session secret.
 const sessionSecret = required("SESSION_SECRET");
 const adminPassword = process.env.ADMIN_PASSWORD || "change-this-password";
 if (isProd) {
-  const problems = [];
   if (sessionSecret.length < 32 || /change-me/i.test(sessionSecret)) {
-    problems.push("SESSION_SECRET must be a long random string (32+ characters), not the example value");
-  }
-  if (!process.env.ADMIN_PASSWORD || /^(change-this-password|admin@123|password)$/i.test(adminPassword)) {
-    problems.push("ADMIN_PASSWORD must be set to a strong password, not the example/default value");
-  }
-  if (problems.length) {
-    throw new Error(`Unsafe production configuration:\n - ${problems.join("\n - ")}`);
+    throw new Error(
+      "Unsafe production configuration: SESSION_SECRET must be a long random string (32+ characters), not the example value"
+    );
   }
   if (!Number(process.env.TRUST_PROXY)) {
     console.warn(
@@ -59,7 +54,16 @@ if (isProd) {
   }
 }
 
+// ADMIN_PASSWORD is only used to create / reset the first admin account (create-admin, seed),
+// not while the server is running — so it is checked there, not at startup.
+function assertSafeAdminPassword() {
+  if (isProd && (!process.env.ADMIN_PASSWORD || /^(change-this-password|admin@123|password)$/i.test(adminPassword))) {
+    throw new Error("ADMIN_PASSWORD must be set to a strong password (not the example/default) before creating an admin in production");
+  }
+}
+
 module.exports = {
+  assertSafeAdminPassword,
   nodeEnv,
   isProd,
   port,
