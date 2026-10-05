@@ -2,6 +2,5 @@ node_modules/
 .env
 .DS_Store
 npm-debug.log*
-uploads/**
 !uploads/**/.gitkeep
 !uploads/README.txt
