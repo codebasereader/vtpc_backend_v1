@@ -8,6 +8,7 @@ const MongoStore = require("connect-mongo");
 const env = require("./config/env");
 const { sessionCookieOptions } = require("./config/session");
 const { attachUser } = require("./middleware/auth");
+const { csrfGuard } = require("./middleware/csrf");
 const { notFoundHandler, errorHandler } = require("./utils/errors");
 const { ensureUploadDirs } = require("./utils/upload");
 const authRoutes = require("./routes/auth");
@@ -27,7 +28,11 @@ function createApp() {
   app.use(
     helmet({
       crossOriginResourcePolicy: { policy: "cross-origin" },
-      contentSecurityPolicy: false,
+      // This is a JSON API: it never needs to load or run anything.
+      contentSecurityPolicy: {
+        useDefaults: false,
+        directives: { defaultSrc: ["'none'"], frameAncestors: ["'none'"] },
+      },
     })
   );
   app.use(morgan(env.isProd ? "combined" : "dev"));
@@ -44,8 +49,10 @@ function createApp() {
     })
   );
 
-  app.use(express.json({ limit: "10mb" }));
-  app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+  // Only market-data releases are large; every other JSON body stays small.
+  app.use("/admin/market-releases", express.json({ limit: "10mb" }));
+  app.use(express.json({ limit: "1mb" }));
+  app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
   app.use(
     session({
@@ -65,8 +72,22 @@ function createApp() {
 
   app.use(attachUser);
 
+  // Logged-in data must never be kept by browsers or shared proxies.
+  app.use(["/admin", "/auth"], (req, res, next) => {
+    res.setHeader("Cache-Control", "no-store");
+    next();
+  });
+
+  // Admin and login writes must come from our own front-end (see middleware/csrf.js).
+  app.use(["/admin", "/auth"], csrfGuard);
+
   app.use(
     "/uploads",
+    (req, res, next) => {
+      // Belt and braces: nothing served from uploads may ever run script.
+      res.setHeader("Content-Security-Policy", "script-src 'none'");
+      next();
+    },
     express.static(env.uploadsDir, {
       maxAge: env.isProd ? "7d" : 0,
       index: false,

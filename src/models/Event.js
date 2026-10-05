@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { safeLinkValidator } = require("../utils/validate");
 const { bilingualSchema } = require("./schemas/common");
 const { apiJson } = require("./plugins/apiJson");
 
@@ -13,7 +14,7 @@ const eventSchema = new mongoose.Schema(
     endDate: { type: Date },
     tbaYear: { type: Number },
     description: { type: bilingualSchema, default: () => ({}) },
-    registrationLink: { type: String, default: "" },
+    registrationLink: { type: String, default: "", validate: safeLinkValidator },
   },
   { timestamps: true }
 );

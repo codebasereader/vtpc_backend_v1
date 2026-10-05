@@ -21,7 +21,9 @@ const listPublic = asyncHandler(async (req, res) => {
 const getPublic = asyncHandler(async (req, res) => {
   const row = await MarketRelease.findOne({ key: String(req.params.key || "").toLowerCase() });
   if (!row) throw new HttpError(404, "Market release not found");
-  res.json(row.toJSON());
+  // Who published it is for the admin audit log, not the public.
+  const { updatedBy, ...publicRelease } = row.toJSON();
+  res.json(publicRelease);
 });
 
 const upsert = asyncHandler(async (req, res) => {

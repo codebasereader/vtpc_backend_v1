@@ -4,6 +4,8 @@ const { spawn } = require("child_process");
 const mongoose = require("mongoose");
 const env = require("../config/env");
 
+const FFMPEG_TIMEOUT_MS = 15 * 60 * 1000;
+
 const inflight = new Set();
 const queue = [];
 let running = false;
@@ -38,12 +40,15 @@ function resolveFfmpegBin() {
 function runFfmpeg(args) {
   return new Promise((resolve, reject) => {
     const proc = spawn(resolveFfmpegBin(), args, { stdio: ["ignore", "ignore", "pipe"] });
+    // A crafted video must not be able to tie the server up forever.
+    const timer = setTimeout(() => proc.kill("SIGKILL"), FFMPEG_TIMEOUT_MS);
     let stderr = "";
     proc.stderr.on("data", (chunk) => {
       stderr += chunk;
       if (stderr.length > 8000) stderr = stderr.slice(-4000);
     });
     proc.on("error", (err) => {
+      clearTimeout(timer);
       if (err.code === "ENOENT") {
         reject(Object.assign(new Error("ffmpeg is not installed"), { code: "ENOENT" }));
       } else {
@@ -51,6 +56,7 @@ function runFfmpeg(args) {
       }
     });
     proc.on("close", (code) => {
+      clearTimeout(timer);
       if (code === 0) resolve();
       else reject(new Error(stderr.trim() || `ffmpeg exited ${code}`));
     });

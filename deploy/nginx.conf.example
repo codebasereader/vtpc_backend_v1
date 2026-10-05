@@ -11,14 +11,21 @@ server {
     # ssl_certificate     /etc/letsencrypt/live/api.example.gov.in/fullchain.pem;
     # ssl_certificate_key /etc/letsencrypt/live/api.example.gov.in/privkey.pem;
 
+    # Largest legitimate upload is an 80 MB video; admin JSON is small.
     client_max_body_size 80M;
 
+    # Extra brake on login guessing (the app also rate-limits).
+    # In the http {} block: limit_req_zone $binary_remote_addr zone=login:10m rate=10r/m;
+    # location = /auth/login { limit_req zone=login burst=5 nodelay; proxy_pass http://127.0.0.1:4200; ... }
+
     location / {
-        proxy_pass http://127.0.0.1:4000;
+        # Must match PORT in the API's .env (4200 in .env.example).
+        proxy_pass http://127.0.0.1:4200;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        # Overwrite, don't append: a client-supplied X-Forwarded-For must never be trusted.
+        proxy_set_header X-Forwarded-For $remote_addr;
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 }

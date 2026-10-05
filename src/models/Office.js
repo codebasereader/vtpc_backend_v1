@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { safeLinkValidator } = require("../utils/validate");
 const { bilingualSchema } = require("./schemas/common");
 const { apiJson } = require("./plugins/apiJson");
 
@@ -9,7 +10,7 @@ const officeSchema = new mongoose.Schema(
     address: { type: bilingualSchema, default: () => ({}) },
     phone: { type: String, default: "", trim: true },
     email: { type: String, default: "", trim: true },
-    mapLink: { type: String, default: "" },
+    mapLink: { type: String, default: "", validate: safeLinkValidator },
   },
   { timestamps: true }
 );

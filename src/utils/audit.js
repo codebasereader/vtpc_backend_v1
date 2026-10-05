@@ -24,11 +24,11 @@ const MUTATING = new Set([
   "permissions_change",
 ]);
 
+// Only Express's own `req.ip` is trusted. It already honours X-Forwarded-For
+// when TRUST_PROXY is set for a known reverse proxy; reading the header
+// directly would let any client write a made-up address into the audit log.
 function clientIp(req) {
-  const forwarded = String(req?.headers?.["x-forwarded-for"] || "")
-    .split(",")[0]
-    .trim();
-  return forwarded || req?.ip || "";
+  return req?.ip || "";
 }
 
 function userAgent(req) {
@@ -231,7 +231,17 @@ async function endUserSessions(userId, endedBy) {
   await destroyExpressSessions(userId);
 }
 
-async function destroyExpressSessions(userId) {
+/** Ends every other login of this user (e.g. after a password change), keeping the current one. */
+async function endOtherUserSessions(userId, { keepSessionId, keepAuditSessionId }, endedBy) {
+  const open = await AuditSession.find({ "actor.id": String(userId), logoutAt: null });
+  for (const session of open) {
+    if (keepAuditSessionId && String(session._id) === String(keepAuditSessionId)) continue;
+    await endSession(session._id, endedBy);
+  }
+  await destroyExpressSessions(userId, keepSessionId);
+}
+
+async function destroyExpressSessions(userId, keepSessionId = null) {
   try {
     const col = mongoose.connection.collection("sessions");
     const ids = [];
@@ -239,6 +249,7 @@ async function destroyExpressSessions(userId) {
     for await (const doc of cursor) {
       try {
         const data = typeof doc.session === "string" ? JSON.parse(doc.session) : doc.session;
+        if (keepSessionId && String(doc._id) === String(keepSessionId)) continue;
         if (data && String(data.userId) === String(userId)) ids.push(doc._id);
       } catch {
         /* ignore corrupt session rows */
@@ -286,6 +297,7 @@ module.exports = {
   startSession,
   endSession,
   endUserSessions,
+  endOtherUserSessions,
   destroyExpressSessions,
   touchSession,
   expireStaleSessions,

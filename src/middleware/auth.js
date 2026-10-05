@@ -5,6 +5,7 @@ const { record, endSession, touchSession } = require("../utils/audit");
 const { staffPermissionForGroup } = require("../config/permissions");
 const { findByParam } = require("../utils/lookup");
 const { StaffMember } = require("../models");
+const env = require("../config/env");
 
 function forbidden(req, next, resource) {
   record(req, {
@@ -32,7 +33,11 @@ async function attachUser(req, res, next) {
       return next();
     }
     const user = await AdminUser.findById(req.session.userId).populate("role");
-    if (!user || !user.isActive || !user.role) {
+    const now = Date.now();
+    const startedAt = req.session.createdAt || now;
+    const lastSeen = req.session.lastSeen || now;
+    const timedOut = now - startedAt > env.sessionAbsoluteMs || now - lastSeen > env.sessionIdleMs;
+    if (!user || !user.isActive || !user.role || timedOut) {
       const sessionId = req.session.auditSessionId;
       const endedBy = user && !user.isActive ? "deactivated" : "expired";
       req.session.destroy(() => {});
@@ -46,6 +51,8 @@ async function attachUser(req, res, next) {
       }
       return next();
     }
+    req.session.createdAt = startedAt;
+    req.session.lastSeen = now;
     req.user = user;
     req.permissions = new Set(permissionList(user));
     req.isSuperAdmin = isSuperAdmin(user);

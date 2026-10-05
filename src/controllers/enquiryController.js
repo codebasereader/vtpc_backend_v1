@@ -2,6 +2,7 @@ const { Enquiry, GIProduct } = require("../models");
 const { asyncHandler, HttpError } = require("../utils/errors");
 const { findByParamOrThrow } = require("../utils/lookup");
 const { record } = require("../utils/audit");
+const { isEmail } = require("../utils/validate");
 
 function contactedByLabel(user) {
   if (!user) return "";
@@ -27,6 +28,13 @@ const create = asyncHandler(async (req, res) => {
   if (!productId || !name || !email || !message) {
     throw new HttpError(400, "productId, name, email and message are required");
   }
+  if (String(productId).length > 100) throw new HttpError(400, "Unknown GI product");
+  if (String(name).trim().length > 120) throw new HttpError(400, "name must be 120 characters or fewer");
+  if (!isEmail(String(email).trim().toLowerCase())) throw new HttpError(400, "A valid email is required");
+  if (phone && !/^[0-9+\s()-]{7,20}$/.test(String(phone).trim())) {
+    throw new HttpError(400, "phone must be 7–20 characters of digits, spaces, +, (, ) or -");
+  }
+  if (String(message).trim().length > 2000) throw new HttpError(400, "message must be 2000 characters or fewer");
 
   const slug = String(productId).trim().toLowerCase();
   const product = await GIProduct.findOne({ slug });

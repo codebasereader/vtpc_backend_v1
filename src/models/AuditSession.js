@@ -15,7 +15,7 @@ const auditSessionSchema = new mongoose.Schema(
     logoutAt: { type: Date, default: null },
     endedBy: {
       type: String,
-      enum: ["logout", "expired", "deactivated", "password_reset", null],
+      enum: ["logout", "expired", "deactivated", "password_reset", "password_change", null],
       default: null,
     },
     lastActivityAt: { type: Date, default: Date.now },

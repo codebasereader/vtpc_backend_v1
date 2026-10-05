@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { safeLinkValidator } = require("../utils/validate");
 const { bilingualSchema } = require("./schemas/common");
 const { apiJson } = require("./plugins/apiJson");
 
@@ -15,7 +16,7 @@ const downloadSchema = new mongoose.Schema(
       },
     },
     order: { type: Number, default: 0 },
-    fileUrl: { type: String, default: "" },
+    fileUrl: { type: String, default: "", validate: safeLinkValidator },
     uploadedAt: { type: Date, default: Date.now },
   },
   { timestamps: true }

@@ -14,11 +14,19 @@ function parseMaybeJson(value) {
   }
 }
 
+// Keys that would reach Object.prototype (or a constructor) if used as a property name.
+const UNSAFE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
+
+function hasUnsafeKey(parts) {
+  return parts.some((part) => UNSAFE_KEYS.has(part));
+}
+
 function setPath(target, pathParts, value) {
   let cursor = target;
   for (let i = 0; i < pathParts.length - 1; i += 1) {
     const key = pathParts[i];
-    if (!cursor[key] || typeof cursor[key] !== "object") {
+    // Only follow properties the object really owns, never inherited ones.
+    if (!Object.prototype.hasOwnProperty.call(cursor, key) || !cursor[key] || typeof cursor[key] !== "object") {
       cursor[key] = {};
     }
     cursor = cursor[key];
@@ -30,12 +38,16 @@ function parseRequestBody(raw = {}) {
   const body = {};
 
   for (const [key, value] of Object.entries(raw)) {
+    if (UNSAFE_KEYS.has(key)) continue;
     const parsed = parseMaybeJson(value);
     if (key.includes("[") && key.endsWith("]")) {
-      const parts = key.replace(/\]/g, "").split("[");
-      setPath(body, parts.filter(Boolean), parsed);
+      const parts = key.replace(/\]/g, "").split("[").filter(Boolean);
+      if (hasUnsafeKey(parts)) continue;
+      setPath(body, parts, parsed);
     } else if (key.includes(".")) {
-      setPath(body, key.split("."), parsed);
+      const parts = key.split(".");
+      if (hasUnsafeKey(parts)) continue;
+      setPath(body, parts, parsed);
     } else {
       body[key] = parsed;
     }

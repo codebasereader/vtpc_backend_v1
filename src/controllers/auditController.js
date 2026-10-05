@@ -76,11 +76,7 @@ function logJson(row) {
   };
 }
 
-function csvEscape(value) {
-  const s = String(value ?? "");
-  if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
-  return s;
-}
+const { csvCell: csvEscape } = require("../utils/csv");
 
 const listLogs = asyncHandler(async (req, res) => {
   const { skip, limit } = paging(req.query);

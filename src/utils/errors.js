@@ -25,6 +25,14 @@ function errorHandler(err, req, res, next) {
     return res.status(err.status).json(body);
   }
 
+  // Request-body problems raised by the JSON / form parsers.
+  if (err.type === "entity.too.large") {
+    return res.status(413).json({ message: "Request body is too large" });
+  }
+  if (err.type === "entity.parse.failed" || err.type === "encoding.unsupported") {
+    return res.status(400).json({ message: "Invalid request body" });
+  }
+
   if (err.name === "ValidationError") {
     const message = Object.values(err.errors)
       .map((e) => e.message)

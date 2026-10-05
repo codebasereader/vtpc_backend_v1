@@ -19,6 +19,10 @@ adminUserSchema.methods.verifyPassword = function verifyPassword(password) {
   return bcrypt.compare(password, this.passwordHash);
 };
 
+adminUserSchema.statics.verifyAgainst = function verifyAgainst(hash, password) {
+  return bcrypt.compare(password, hash);
+};
+
 adminUserSchema.statics.hashPassword = function hashPassword(password) {
   return bcrypt.hash(password, 12);
 };

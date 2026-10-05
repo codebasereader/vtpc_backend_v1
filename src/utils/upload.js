@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 const multer = require("multer");
 const env = require("../config/env");
 const { toSlug } = require("./slug");
@@ -31,6 +32,34 @@ const DOC_TYPES = new Set([
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 ]);
 
+// What each accepted file type must look like. The browser-sent MIME type and
+// file name are only claims, so both the extension and the first bytes of the
+// file are checked against this table.
+const FILE_KINDS = {
+  "image/jpeg": { exts: [".jpg", ".jpeg"], sig: (b) => b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff },
+  "image/jpg": { exts: [".jpg", ".jpeg"], sig: (b) => b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff },
+  "image/png": { exts: [".png"], sig: (b) => b.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])) },
+  "image/gif": { exts: [".gif"], sig: (b) => b.subarray(0, 4).toString("latin1") === "GIF8" },
+  "image/webp": {
+    exts: [".webp"],
+    sig: (b) => b.subarray(0, 4).toString("latin1") === "RIFF" && b.subarray(8, 12).toString("latin1") === "WEBP",
+  },
+  "video/mp4": { exts: [".mp4", ".m4v"], sig: (b) => b.subarray(4, 8).toString("latin1") === "ftyp" },
+  "video/quicktime": { exts: [".mov"], sig: (b) => b.subarray(4, 8).toString("latin1") === "ftyp" },
+  "video/webm": { exts: [".webm"], sig: (b) => b[0] === 0x1a && b[1] === 0x45 && b[2] === 0xdf && b[3] === 0xa3 },
+  "application/pdf": { exts: [".pdf"], sig: (b) => b.subarray(0, 5).toString("latin1") === "%PDF-" },
+  "application/msword": { exts: [".doc"], sig: (b) => b.subarray(0, 4).equals(Buffer.from([0xd0, 0xcf, 0x11, 0xe0])) },
+  "application/vnd.ms-excel": { exts: [".xls"], sig: (b) => b.subarray(0, 4).equals(Buffer.from([0xd0, 0xcf, 0x11, 0xe0])) },
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": {
+    exts: [".docx"],
+    sig: (b) => b.subarray(0, 4).equals(Buffer.from([0x50, 0x4b, 0x03, 0x04])),
+  },
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+    exts: [".xlsx"],
+    sig: (b) => b.subarray(0, 4).equals(Buffer.from([0x50, 0x4b, 0x03, 0x04])),
+  },
+};
+
 function ensureUploadDirs() {
   for (const folder of FOLDERS) {
     fs.mkdirSync(path.join(env.uploadsDir, folder), { recursive: true });
@@ -47,8 +76,9 @@ function diskPathFor(folder, filename) {
 
 function uniqueName(original) {
   const ext = path.extname(original || "").toLowerCase();
-  const base = toSlug(path.basename(original || "file", ext)) || "file";
-  return `${Date.now()}-${base}${ext}`;
+  const base = (toSlug(path.basename(original || "file", ext)) || "file").slice(0, 60);
+  // The random part makes stored files impossible to guess from the name.
+  return `${Date.now()}-${crypto.randomBytes(6).toString("hex")}-${base}${ext}`;
 }
 
 function folderFor(req, file) {
@@ -75,14 +105,53 @@ function fileFilter(req, file, cb) {
   if (!ok) {
     return cb(new HttpError(400, `Unsupported file type: ${mime}`));
   }
+  const ext = path.extname(file.originalname || "").toLowerCase();
+  if (!FILE_KINDS[mime]?.exts.includes(ext)) {
+    return cb(new HttpError(400, `The file extension "${ext || "(none)"}" does not match its type (${mime})`));
+  }
   cb(null, true);
 }
 
-const upload = multer({
+const rawUpload = multer({
   storage,
   fileFilter,
   limits: { fileSize: 80 * 1024 * 1024, files: 4 },
 });
+
+function removeFiles(files) {
+  for (const file of files) {
+    if (file?.path) fs.unlink(file.path, () => {});
+  }
+}
+
+/** Rejects (and deletes) any uploaded file whose first bytes don't match its claimed type. */
+function verifyUploadedFiles(req, res, next) {
+  const files = collectFiles(req);
+  try {
+    for (const file of files) {
+      const kind = FILE_KINDS[file.mimetype];
+      const fd = fs.openSync(file.path, "r");
+      const head = Buffer.alloc(16);
+      fs.readSync(fd, head, 0, 16, 0);
+      fs.closeSync(fd);
+      if (!kind || !kind.sig(head)) {
+        removeFiles(files);
+        return next(new HttpError(400, `"${file.originalname}" is not a valid ${file.mimetype} file`));
+      }
+    }
+  } catch (err) {
+    removeFiles(files);
+    return next(err);
+  }
+  next();
+}
+
+// Same call shape as multer (`upload.any()`, `upload.single("file")`), but every
+// file is content-checked straight after it is stored.
+const upload = {
+  any: () => [rawUpload.any(), verifyUploadedFiles],
+  single: (field) => [rawUpload.single(field), verifyUploadedFiles],
+};
 
 function setUploadFolder(folder) {
   return (req, res, next) => {

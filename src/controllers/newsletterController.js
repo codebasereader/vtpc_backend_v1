@@ -3,11 +3,8 @@ const { asyncHandler, HttpError } = require("../utils/errors");
 const { findByParamOrThrow } = require("../utils/lookup");
 const { record } = require("../utils/audit");
 
-function csvEscape(value) {
-  const s = String(value ?? "");
-  if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
-  return s;
-}
+const { csvCell: csvEscape } = require("../utils/csv");
+const { isEmail } = require("../utils/validate");
 
 function subscriberStatus(row) {
   return row.status === "blocked" ? "blocked" : "active";
@@ -24,17 +21,17 @@ function toSubscriberJson(row) {
 
 const subscribe = asyncHandler(async (req, res) => {
   const email = String(req.body?.email || "").trim().toLowerCase();
-  if (!email || !email.includes("@")) {
+  if (!isEmail(email)) {
     throw new HttpError(400, "A valid email is required");
   }
 
+  // Same answer whether or not the address was already subscribed, so this
+  // form can't be used to find out who is on the list.
   const existing = await NewsletterSubscriber.findOne({ email });
-  if (existing) {
-    return res.status(200).json({ email: existing.email });
+  if (!existing) {
+    await NewsletterSubscriber.create({ email, status: "active" });
   }
-
-  const created = await NewsletterSubscriber.create({ email, status: "active" });
-  return res.status(201).json({ email: created.email });
+  return res.status(200).json({ email });
 });
 
 const list = asyncHandler(async (req, res) => {

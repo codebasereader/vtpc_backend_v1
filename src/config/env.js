@@ -37,6 +37,28 @@ try {
   // invalid URL is handled when a request tries to build a file link
 }
 
+// Refuse to run in production with the example secrets or passwords.
+const sessionSecret = required("SESSION_SECRET");
+const adminPassword = process.env.ADMIN_PASSWORD || "change-this-password";
+if (isProd) {
+  const problems = [];
+  if (sessionSecret.length < 32 || /change-me/i.test(sessionSecret)) {
+    problems.push("SESSION_SECRET must be a long random string (32+ characters), not the example value");
+  }
+  if (!process.env.ADMIN_PASSWORD || /^(change-this-password|admin@123|password)$/i.test(adminPassword)) {
+    problems.push("ADMIN_PASSWORD must be set to a strong password, not the example/default value");
+  }
+  if (problems.length) {
+    throw new Error(`Unsafe production configuration:\n - ${problems.join("\n - ")}`);
+  }
+  if (!Number(process.env.TRUST_PROXY)) {
+    console.warn(
+      "TRUST_PROXY is 0. Behind nginx/a load balancer set TRUST_PROXY=1, otherwise every visitor shares one " +
+        "IP address (rate limits and audit logs will be wrong)."
+    );
+  }
+}
+
 module.exports = {
   nodeEnv,
   isProd,
@@ -44,14 +66,17 @@ module.exports = {
   publicBaseUrl,
   corsOrigins,
   mongodbUri: required("MONGODB_URI"),
-  sessionSecret: required("SESSION_SECRET"),
+  sessionSecret,
   cookieName: process.env.COOKIE_NAME || "vtpc.sid",
   cookieSameSite: (process.env.COOKIE_SAMESITE || "lax").toLowerCase(),
   sessionDays: Number(process.env.SESSION_DAYS) || 7,
+  // A login ends after this long without activity, and never lasts longer than the absolute limit.
+  sessionIdleMs: (Number(process.env.SESSION_IDLE_MINUTES) || 120) * 60 * 1000,
+  sessionAbsoluteMs: (Number(process.env.SESSION_ABSOLUTE_HOURS) || 12) * 60 * 60 * 1000,
   trustProxy: Number(process.env.TRUST_PROXY) || 0,
   admin: {
     email: process.env.ADMIN_EMAIL || "editor@vtpc.gov.in",
-    password: process.env.ADMIN_PASSWORD || "change-this-password",
+    password: adminPassword,
     name: process.env.ADMIN_NAME || "Editor",
   },
   smtp: {
