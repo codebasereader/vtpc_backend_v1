@@ -13,7 +13,6 @@ const users = require("../controllers/userController");
 const audit = require("../controllers/auditController");
 const {
   leaders,
-  districts,
   cities,
   focusSectors,
   eventSectors,
@@ -71,10 +70,6 @@ router.delete("/pages/:id", page.remove);
 router.post("/leaders", setUploadFolders({ photo: "leaders", file: "leaders" }), upload.any(), optimizeUploadedImages, leaders.create);
 router.put("/leaders/:id", setUploadFolders({ photo: "leaders", file: "leaders" }), upload.any(), optimizeUploadedImages, leaders.update);
 router.delete("/leaders/:id", leaders.remove);
-
-router.post("/districts", districts.create);
-router.put("/districts/:id", districts.update);
-router.delete("/districts/:id", districts.remove);
 
 router.post("/cities", cities.create);
 router.put("/cities/:id", cities.update);

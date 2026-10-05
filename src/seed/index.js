@@ -111,7 +111,11 @@ async function seed() {
   await migrateEvents();
   await replaceCollection(Page, data.pages, "slug");
   await replaceCollection(Leader, data.leaders, "name.en");
-  await replaceCollection(District, data.districts, "slug");
+  await replaceCollection(
+    District,
+    data.districts.map(({ slug, name }) => ({ slug, name })),
+    "slug"
+  );
   await replaceCollection(City, data.cities, "slug");
   await replaceCollection(FocusSector, data.focusSectors, "slug");
   const removedSectors = await FocusSector.deleteMany({

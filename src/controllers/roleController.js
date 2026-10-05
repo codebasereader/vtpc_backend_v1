@@ -12,7 +12,8 @@ function roleJson(role, userCount = 0) {
     name: json.name,
     slug: json.slug,
     description: json.description || "",
-    permissions: json.isSystem ? [] : json.permissions || [],
+    // Keys that are no longer in the catalog (e.g. a removed page) are hidden.
+    permissions: json.isSystem ? [] : (json.permissions || []).filter(isCatalogKey),
     isSystem: Boolean(json.isSystem),
     userCount,
     createdAt: json.createdAt,

@@ -22,7 +22,6 @@ const PERMISSION_GROUPS = [
   {
     group: "Exporter Corner",
     items: [
-      { key: "districts", title: "Districts" },
       { key: "focusSectors", title: "Focus Sectors" },
       { key: "taluks", title: "Taluks" },
       { key: "warehouses", title: "Warehouses" },
@@ -57,7 +56,6 @@ const PERMISSION_KEY_SET = new Set(PERMISSION_KEYS);
 
 const ROUTE_PERMISSIONS = [
   ["/leaders", "leaders"],
-  ["/districts", "districts"],
   ["/focus-sectors", "focusSectors"],
   ["/events", "events"],
   ["/cities", "cities"],

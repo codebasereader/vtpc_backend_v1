@@ -42,85 +42,39 @@ const leaders = [
   },
 ];
 
-const defaultShare = [
-  { name: "Rest of world", percentage: 100 },
-];
-
-function district(id, name, tagline, extra = {}) {
-  return {
-    slug: id,
-    name,
-    tagline: bilingual(tagline),
-    totalExportValueCr: extra.totalExportValueCr || 0,
-    countries: extra.countries || defaultShare,
-    products: extra.products || defaultShare.map((row) => ({ name: "Mixed commodities", percentage: row.percentage })),
-    sectors: extra.sectors || [{ name: "Agriculture", percentage: 40 }, { name: "Manufacturing", percentage: 35 }, { name: "Others", percentage: 25 }],
-  };
-}
-
+// District names only. District export figures come from the Market Data releases,
+// so no export numbers are seeded here.
 const districts = [
-  district("bagalkote", "Bagalkote", "Lime and heritage crafts"),
-  district("ballari", "Ballari", "Steel and mining belt"),
-  district("belagavi", "Belagavi", "Foundry and sugar"),
-  district("bengaluru-rural", "Bengaluru Rural", "Peri-urban manufacturing"),
-  district("bengaluru-urban", "Bengaluru Urban", "IT and advanced manufacturing", {
-    totalExportValueCr: 9800,
-    countries: [
-      { name: "USA", percentage: 34.2 },
-      { name: "Netherlands", percentage: 12.1 },
-      { name: "UK", percentage: 9.4 },
-    ],
-    products: [
-      { name: "Software and IT services", percentage: 62.0 },
-      { name: "Electronics", percentage: 11.5 },
-    ],
-    sectors: [
-      { name: "IT & ITeS", percentage: 62 },
-      { name: "Engineering", percentage: 18 },
-      { name: "Others", percentage: 20 },
-    ],
-  }),
-  district("bidar", "Bidar", "Bidriware and pulses"),
-  district("chamarajanagar", "Chamarajanagar", "Forest produce and tourism"),
-  district("chikkaballapur", "Chikkaballapur", "Sericulture and horticulture"),
-  district("chikkamagaluru", "Chikkamagaluru", "Coffee country"),
-  district("chitradurga", "Chitradurga", "Wind energy and mining"),
-  district("dakshina-kannada", "Dakshina Kannada", "Port-led trade"),
-  district("davanagere", "Davanagere", "Textile and education hub"),
-  district("dharwad", "Dharwad", "Auto components and education"),
-  district("gadag", "Gadag", "Textiles and oilseeds"),
-  district("hassan", "Hassan", "Coffee and spices"),
-  district("haveri", "Haveri", "Byadgi chilli and by-products"),
-  district("kalaburagi", "Kalaburagi", "Tur Bowl of Karnataka", {
-    totalExportValueCr: 129.67,
-    countries: [
-      { name: "Indonesia", percentage: 32.19 },
-      { name: "Malaysia", percentage: 18.4 },
-      { name: "UAE", percentage: 11.2 },
-    ],
-    products: [
-      { name: "Sugars and Sugar Confectionery", percentage: 22.8 },
-      { name: "Pulses", percentage: 19.1 },
-    ],
-    sectors: [
-      { name: "Agriculture", percentage: 25.9 },
-      { name: "Food processing", percentage: 21.4 },
-      { name: "Others", percentage: 52.7 },
-    ],
-  }),
-  district("kodagu", "Kodagu", "Coffee and honey"),
-  district("kolar", "Kolar", "Milk, silk and vegetables"),
-  district("koppal", "Koppal", "Iron ore and paddy"),
-  district("mandya", "Mandya", "Sugar bowl of Old Mysore"),
-  district("mysuru", "Mysuru", "Silk, tourism and industry"),
-  district("raichur", "Raichur", "Paddy and power"),
-  district("ramanagara", "Ramanagara", "Silk city"),
-  district("shivamogga", "Shivamogga", "Arecanut and hydel"),
-  district("tumakuru", "Tumakuru", "Engineering and food parks"),
-  district("udupi", "Udupi", "Coastal fisheries and cuisine"),
-  district("uttara-kannada", "Uttara Kannada", "Karavali trade and spices"),
-  district("vijayapura", "Vijayapura", "Grapes and limestone"),
-  district("yadgir", "Yadgir", "Paddy and pulses"),
+  { slug: "bagalkote", name: "Bagalkote" },
+  { slug: "ballari", name: "Ballari" },
+  { slug: "belagavi", name: "Belagavi" },
+  { slug: "bengaluru-rural", name: "Bengaluru Rural" },
+  { slug: "bengaluru-urban", name: "Bengaluru Urban" },
+  { slug: "bidar", name: "Bidar" },
+  { slug: "chamarajanagar", name: "Chamarajanagar" },
+  { slug: "chikkaballapur", name: "Chikkaballapur" },
+  { slug: "chikkamagaluru", name: "Chikkamagaluru" },
+  { slug: "chitradurga", name: "Chitradurga" },
+  { slug: "dakshina-kannada", name: "Dakshina Kannada" },
+  { slug: "davanagere", name: "Davanagere" },
+  { slug: "dharwad", name: "Dharwad" },
+  { slug: "gadag", name: "Gadag" },
+  { slug: "hassan", name: "Hassan" },
+  { slug: "haveri", name: "Haveri" },
+  { slug: "kalaburagi", name: "Kalaburagi" },
+  { slug: "kodagu", name: "Kodagu" },
+  { slug: "kolar", name: "Kolar" },
+  { slug: "koppal", name: "Koppal" },
+  { slug: "mandya", name: "Mandya" },
+  { slug: "mysuru", name: "Mysuru" },
+  { slug: "raichur", name: "Raichur" },
+  { slug: "ramanagara", name: "Ramanagara" },
+  { slug: "shivamogga", name: "Shivamogga" },
+  { slug: "tumakuru", name: "Tumakuru" },
+  { slug: "udupi", name: "Udupi" },
+  { slug: "uttara-kannada", name: "Uttara Kannada" },
+  { slug: "vijayapura", name: "Vijayapura" },
+  { slug: "yadgir", name: "Yadgir" },
 ];
 
 const giProducts = [];

@@ -14,6 +14,8 @@ const {
   DownloadCategory,
 } = require("../models");
 const { makeCrud } = require("./crud");
+const { asyncHandler } = require("../utils/errors");
+const { findByParamOrThrow } = require("../utils/lookup");
 
 const leaders = makeCrud(Leader, {
   label: "Leader",
@@ -22,12 +24,19 @@ const leaders = makeCrud(Leader, {
   fileFields: { photo: "leaders" },
 });
 
-const districts = makeCrud(District, {
-  label: "District",
-  resource: "districts",
-  slugField: "slug",
-  slugFrom: "name",
-});
+// Districts are a fixed list of names (used by the warehouse / taluk pickers). Their export
+// figures come from the Market Data releases, so nothing but the name is stored or served here.
+const districtView = (doc) => ({ id: doc.slug, name: doc.name });
+const districts = {
+  list: asyncHandler(async (req, res) => {
+    const rows = await District.find().sort({ name: 1 });
+    res.json(rows.map(districtView));
+  }),
+  get: asyncHandler(async (req, res) => {
+    const doc = await findByParamOrThrow(District, req.params.id, "slug", "District");
+    res.json(districtView(doc));
+  }),
+};
 
 const cities = makeCrud(City, {
   label: "City",
